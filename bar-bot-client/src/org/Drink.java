@@ -55,8 +55,10 @@ public class Drink {
 	 * as attached to the arduino.  
 	 */
 	public byte[] getByteArray(ConfigInterface input) throws Exception{
-		byte[] out=new byte[this.ingredients.size()];
-		int pos=0;
+		byte[] out=new byte[this.ingredients.size()+2];
+		out[0]=1;
+		out[1]=(byte) this.ingredients.size();
+		int pos=1;
 		for(String ingredient:ingredients.keySet()){
 			int pumpID=input.getPumpID(ingredient);
 			if(pumpID==-1)

@@ -8,4 +8,11 @@ public interface ConfigInterface {
 	 * @return the pump id or -1 if entry not found
 	 */
 	public int getPumpID(String name);
+	
+	/**
+	 * return the arduino's ip address.
+	 * @return
+	 */
+	public String getArduinoIP();
+	
 }
