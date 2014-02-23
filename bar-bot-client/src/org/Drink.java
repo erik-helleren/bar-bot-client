@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.json.simple.JSONObject;
 
-public class Drink {
+public class Drink implements Comparable<Drink>{
 	private String name;
 	private Map<String,Integer> ingredients;
 	
@@ -20,8 +20,8 @@ public class Drink {
 		thisJSON.put("Ingredients", ingredients);
 	}
 	
-	public Drink(JSONObject input){
-		thisJSON=input;
+	public Drink(JSONObject jsonObject){
+		thisJSON=jsonObject;
 		this.name=(String) thisJSON.get("DrinkName");
 		ingredients=(Map) thisJSON.get("Ingredients");
 	}
@@ -74,5 +74,28 @@ public class Drink {
 	
 	public String toString(){
 		return thisJSON.toString();
+	}
+
+	@Override
+	public int compareTo(Drink o) {
+		return this.name.compareTo(o.name);
+	}
+	public int hashCode(){
+		return name.hashCode();
+	}
+	
+	public boolean equals(Drink o){
+		boolean out=true;
+		out=out&&(this.name.equals(o.name));
+		for(String ingredient:this.ingredients.keySet()){
+			Integer a=this.ingredients.get(ingredient);
+			Integer b=o.ingredients.get(ingredient);
+			if(b==null) 
+				out=false;
+			else
+				out=out&&(a==b);
+		}
+		this.ingredients.keySet().equals(o.ingredients.keySet());
+		return out;
 	}
 }
