@@ -1,5 +1,6 @@
 package org;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,11 +14,15 @@ public class Drink implements Comparable<Drink>{
 	
 	public Drink(String name,Map<String,Integer> ingerdients){
 		this.name=name;
-		this.ingredients=ingredients;
+		this.ingredients=ingerdients;
 		//build JSON object using the inputs.
 		thisJSON=new JSONObject();
 		thisJSON.put("DrinkName", name);
-		thisJSON.put("Ingredients", ingredients);
+		JSONObject ingJSON=new JSONObject();
+		for(String ingredient:ingredients.keySet()){
+			ingJSON.put(ingredient,ingredients.get(ingredient));
+		}
+		thisJSON.put("Ingredients", ingJSON);
 	}
 	
 	public Drink(JSONObject jsonObject){
@@ -55,17 +60,19 @@ public class Drink implements Comparable<Drink>{
 	 * as attached to the arduino.  
 	 */
 	public byte[] getByteArray(ConfigInterface input) throws Exception{
-		byte[] out=new byte[this.ingredients.size()+2];
+		byte[] out=new byte[this.ingredients.size()*2+2];
 		out[0]=1;
-		out[1]=(byte) this.ingredients.size();
-		int pos=1;
+		out[1]=0;
+		int pos=2;
 		for(String ingredient:ingredients.keySet()){
 			int pumpID=input.getPumpID(ingredient);
 			if(pumpID==-1)
 				throw new Exception("Failed to find ingredient attached to server, cannot make drink");
 			out[pos++]=(byte) pumpID;
 			out[pos++]=(byte)((int)ingredients.get(ingredient));
+			out[1]++;
 		}
+		System.out.println(Arrays.toString(out));
 		return out;
 	}
 	public JSONObject getJSON(){
