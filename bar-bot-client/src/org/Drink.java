@@ -72,7 +72,6 @@ public class Drink implements Comparable<Drink>{
 			out[pos++]=(byte)((int)ingredients.get(ingredient));
 			out[1]++;
 		}
-		System.out.println(Arrays.toString(out));
 		return out;
 	}
 	public JSONObject getJSON(){
