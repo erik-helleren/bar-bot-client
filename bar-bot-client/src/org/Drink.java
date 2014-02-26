@@ -12,9 +12,9 @@ public class Drink implements Comparable<Drink>{
 	
 	private JSONObject thisJSON;
 	
-	public Drink(String name,Map<String,Integer> ingerdients){
-		this.name=name;
-		this.ingredients=ingerdients;
+	public Drink(String _name,Map<String,Integer> _ingredients){
+		name=_name;
+		ingredients=_ingredients;
 		//build JSON object using the inputs.
 		thisJSON=new JSONObject();
 		thisJSON.put("DrinkName", name);
