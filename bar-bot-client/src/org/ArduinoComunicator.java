@@ -16,7 +16,7 @@ import java.util.Collections;
  */
 public class ArduinoComunicator {
 	private static final int port=1234;
-	private static final int timeout=1000;
+	private static final int timeout=3000;
 	
 	/**
 	 * Used to send a make drink command to the arduino.  Will throw if the drink's byte array
@@ -37,7 +37,7 @@ public class ArduinoComunicator {
 	        try{
 	        	returned=kkSocket.getInputStream().read();//will block untill a byte is read or
 	        		//timeout is reached
-	        }catch(SocketTimeoutException e){
+	        }catch(java.net.SocketTimeoutException e){
 	        	e.printStackTrace();
 	        }
 	    } catch (UnknownHostException e) {

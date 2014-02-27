@@ -1,27 +1,32 @@
 package org;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
 
-public class Drink {
+public class Drink implements Comparable<Drink>{
 	private String name;
 	private Map<String,Integer> ingredients;
 	
 	private JSONObject thisJSON;
 	
-	public Drink(String name,Map<String,Integer> ingerdients){
-		this.name=name;
-		this.ingredients=ingredients;
+	public Drink(String _name,Map<String,Integer> _ingredients){
+		name=_name;
+		ingredients=_ingredients;
 		//build JSON object using the inputs.
 		thisJSON=new JSONObject();
 		thisJSON.put("DrinkName", name);
-		thisJSON.put("Ingredients", ingredients);
+		JSONObject ingJSON=new JSONObject();
+		for(String ingredient:ingredients.keySet()){
+			ingJSON.put(ingredient,ingredients.get(ingredient));
+		}
+		thisJSON.put("Ingredients", ingJSON);
 	}
 	
-	public Drink(JSONObject input){
-		thisJSON=input;
+	public Drink(JSONObject jsonObject){
+		thisJSON=jsonObject;
 		this.name=(String) thisJSON.get("DrinkName");
 		ingredients=(Map) thisJSON.get("Ingredients");
 	}
@@ -55,16 +60,17 @@ public class Drink {
 	 * as attached to the arduino.  
 	 */
 	public byte[] getByteArray(ConfigInterface input) throws Exception{
-		byte[] out=new byte[this.ingredients.size()+2];
+		byte[] out=new byte[this.ingredients.size()*2+2];
 		out[0]=1;
-		out[1]=(byte) this.ingredients.size();
-		int pos=1;
+		out[1]=0;
+		int pos=2;
 		for(String ingredient:ingredients.keySet()){
 			int pumpID=input.getPumpID(ingredient);
 			if(pumpID==-1)
 				throw new Exception("Failed to find ingredient attached to server, cannot make drink");
 			out[pos++]=(byte) pumpID;
 			out[pos++]=(byte)((int)ingredients.get(ingredient));
+			out[1]++;
 		}
 		return out;
 	}
@@ -74,5 +80,28 @@ public class Drink {
 	
 	public String toString(){
 		return thisJSON.toString();
+	}
+
+	@Override
+	public int compareTo(Drink o) {
+		return this.name.compareTo(o.name);
+	}
+	public int hashCode(){
+		return name.hashCode();
+	}
+	
+	public boolean equals(Drink o){
+		boolean out=true;
+		out=out&&(this.name.equals(o.name));
+		for(String ingredient:this.ingredients.keySet()){
+			Integer a=this.ingredients.get(ingredient);
+			Integer b=o.ingredients.get(ingredient);
+			if(b==null) 
+				out=false;
+			else
+				out=out&&(a==b);
+		}
+		this.ingredients.keySet().equals(o.ingredients.keySet());
+		return out;
 	}
 }
