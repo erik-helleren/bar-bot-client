@@ -54,6 +54,7 @@ public class ClientGui extends JFrame implements ActionListener{
 	JButton selectionAcceptButton;
 	JButton selectionResetButton;
 	JButton buttonArray[];
+	JTextField selectInfoNameTextField;
 	JTextField selectIngredientNameArray[];
 	JTextField selectAmountTextArray[];
 	
@@ -78,18 +79,28 @@ public class ClientGui extends JFrame implements ActionListener{
 	
 	
 	ClientGui(){
-		userIngredients = new ArrayList<String>();
+		//General window initialization
 		setTitle("Bar-Bot");
 		setSize(1000, 700);
 		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
 		setBackground(Color.gray);
 		//setResizable(false);
 		
+		//This array list contains all ingredients the user has input
+		userIngredients = new ArrayList<String>();
+		
+		//Initializing the drink list
 		drinkList = new DrinkList();
 		drinkList.loadFromFile("DrinkDatabase");
     	drinkArray = drinkList.getDrinkSet();
 		
-
+    	/*
+    	 * These are the overall base panels.
+    	 * barbotPanel contains everything, and 
+    	 * editPanel and selectionPanel handle both
+    	 * the Creation and Selection screens,
+    	 * respectively
+    	 */
 		barbotPanel = new JPanel();
 		barbotPanel.setLayout(new BorderLayout());
 		getContentPane().add(barbotPanel);
@@ -102,6 +113,14 @@ public class ClientGui extends JFrame implements ActionListener{
 		selectionPanel = new JPanel();
 		selectionPanel.setLayout( new BorderLayout()); 
 		barbotPanel.add(selectionPanel);
+		
+		
+		//*************************************************************************************
+		/*
+		 * Beginning of Selection Panel code
+		 */
+		//*************************************************************************************
+		
 		
 		/*
 		 * Accept and Cancel Button Panel
@@ -154,7 +173,7 @@ public class ClientGui extends JFrame implements ActionListener{
 		selectNamePanel.setLayout(new BorderLayout());
 		selectNamePanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		JLabel selectNameLabel = new JLabel("Drink Name:");
-		JTextField selectInfoNameTextField = new JTextField(20);
+		selectInfoNameTextField = new JTextField(20);
 		selectInfoNameTextField.setEditable(false);
 		selectNamePanel.add(selectNameLabel, BorderLayout.WEST);
 		selectNamePanel.add(selectInfoNameTextField, BorderLayout.CENTER);
@@ -168,7 +187,7 @@ public class ClientGui extends JFrame implements ActionListener{
 		
 		
 		/*
-		 * Header text for the Drink creation field
+		 * Header text for the Drink information field
 		 */
 		JPanel selectIngredientPanelArray[] = new JPanel[13];
 		
@@ -187,15 +206,13 @@ public class ClientGui extends JFrame implements ActionListener{
 		
 		
 		/*
-		 * Handles the Labels, textfields, and remove buttons
-		 * in the Drink creation field
+		 * Handles the Labels and textfields
+		 * in the select panel's information field
 		 */
 		JPanel selectIngredientNamePanel[] = new JPanel[12];
 		selectIngredientNameArray = new JTextField[12];
 		JPanel selectTextPanelArray[] = new JPanel[12];
 		selectAmountTextArray = new JTextField[12];
-		//JPanel selectRemovePanelArray[] = new JPanel[12];
-		//JButton selectRemoveIngredientArray[] = new JButton[12];
 		
 		for (int i = 0; i < 12; i++){
 			
@@ -209,20 +226,16 @@ public class ClientGui extends JFrame implements ActionListener{
 			selectAmountTextArray[i].setEditable(false);
 			selectTextPanelArray[i] = new JPanel();
 			selectTextPanelArray[i].add(selectAmountTextArray[i]);
-			
-			
-			//selectRemoveIngredientArray[i] = new JButton("Remove");
-			//selectRemovePanelArray[i] = new JPanel();
-			//selectRemovePanelArray[i].add(selectRemoveIngredientArray[i]);
-			
 	
 			selectIngredientPanelArray[i].add(selectIngredientNamePanel[i],BorderLayout.WEST);
 			selectIngredientPanelArray[i].add(selectTextPanelArray[i],BorderLayout.CENTER);
-			//selectIngredientPanelArray[i].add(selectRemovePanelArray[i],BorderLayout.EAST);
 			selectIngredientPanel.add(selectIngredientPanelArray[i]);
 		}
 		
-		
+		/*
+		 * This is the layout for the Description text box.
+		 * It is currently not being used
+		 */
 		JPanel selectDescriptionPanel = new JPanel(new BorderLayout());
 		JLabel selectDescriptionLabel = new JLabel("Drink Description:");
 		JTextArea selectInfoDescriptionTextArea = new JTextArea();
@@ -284,13 +297,12 @@ public class ClientGui extends JFrame implements ActionListener{
 		try {
 			loadIngredients("ingredients.txt");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		
 		addIngredientDrinkBox = new JComboBox<String>();
-		addIngredientDrinkBox.addItem(new String("        "));
+		addIngredientDrinkBox.addItem(new String("                    "));
 		
 		for(String s:userIngredients){
 			addIngredientDrinkBox.addItem(s);
@@ -400,7 +412,10 @@ public class ClientGui extends JFrame implements ActionListener{
 			editIngredientPanel.add(ingredientPanelArray[i]);
 		}
 		
-		
+		/*
+		 * This is the layout for the Description text box.
+		 * It is currently not being used
+		 */
 		JPanel descriptionPanel = new JPanel(new BorderLayout());
 		JLabel descriptionLabel = new JLabel("Drink Description:");
 		JTextArea infoDescriptionTextArea = new JTextArea();
@@ -427,13 +442,18 @@ public class ClientGui extends JFrame implements ActionListener{
 		createDrink.addActionListener(this);
 		edit.add(createDrink);
 		
-		
+		/*
+		 * Shuts down the java process when the window is closed
+		 */
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
 	public static void main(String[] args) {
+		//This is temporary. The GUI will probably have
+		//a config tab where this can be freely edited.
 		ci=new dummyConfig("192.168.2.3");
 		
+		//Starting the GUI here
 		ClientGui gui = new ClientGui(); 
     	gui.setVisible(true);
     	
@@ -441,20 +461,29 @@ public class ClientGui extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
+		/*
+		 * From here on are the action handlers for buttons and the such
+		 */
 		if(e.getSource() == createDrink){
+			//Switch to Create Drink view
 			selectionPanel.setVisible(false);
 			editPanel.setVisible(true);
 			barbotPanel.remove(selectionPanel);
 			barbotPanel.add(editPanel);
 		}
 		else if(e.getSource() == selectDrink){
+			//Switch to Select Drink view
 			selectionPanel.setVisible(true);
 			editPanel.setVisible(false);
 			barbotPanel.add(selectionPanel);
 			barbotPanel.remove(editPanel);
 		}
 		else if(e.getSource() == selectionAcceptButton){
+			/*
+			 * The Accept button on the Select page.
+			 * Takes selected drink, and sends creation
+			 * data to the Arduino
+			 */
 			System.out.println("Making Drinks");
 			int a;
 			try {
@@ -467,6 +496,12 @@ public class ClientGui extends JFrame implements ActionListener{
 			
 		}
 		else if(e.getSource() == editAcceptButton){
+			/*
+			 * The Accept button on the Create Drink page
+			 * Takes all data currently displayed on the creation
+			 * screen and creates a JSON drink object with it.
+			 * Selection Page buttons are updated from here
+			 */
 			Map<String,Integer> newIngredients = new HashMap<>();
 			int i = 0;
 			while(!ingredientNameArray[i].getText().equals("") && !amountTextArray[i].getText().equals("")){
@@ -475,6 +510,7 @@ public class ClientGui extends JFrame implements ActionListener{
 			}
 			Drink newDrink = new Drink(infoNameTextField.getText(), newIngredients);
 			drinkList.getDrinkSet().add(newDrink);
+			drinkList.writeToFile("DrinkDatabase");
 			
 			try {
 				reInit();
@@ -485,7 +521,9 @@ public class ClientGui extends JFrame implements ActionListener{
 			
 		}
 		else if(e.getSource() == addIngredientDataButton){
+			//Updates Ingredient ComboBox with addIngredientDataField
 			userIngredients.add(addIngredientDataField.getText());
+			addIngredientDataField.setText("");
 			try {
 				saveIngredients("ingredients.txt");
 				reInit();
@@ -495,6 +533,7 @@ public class ClientGui extends JFrame implements ActionListener{
 			}
 		}
 		else if(e.getSource() == addIngredientDrinkButton){
+			//Takes selected item from combo box, and places it in the ingredient list
 			int n = 0;
 			while(!ingredientNameArray[n].getText().equals("")){
 				n++;
@@ -502,10 +541,23 @@ public class ClientGui extends JFrame implements ActionListener{
 			ingredientNameArray[n].setText(addIngredientDrinkBox.getSelectedItem().toString());
 		}
 		
+		/*
+		 * This part is theoretically supposed to fill the information box on the right
+		 * side of the selection screen after a drink button is selected.
+		 * Currently it only is able to draw data from the keySet (ingredient name);
+		 * the size of the drink (the Integer part of the hashmap) is being somehow changed
+		 * to a long, and as a result, I cannot access it.
+		 */
 		for(int i = 0; i < 12; i++){
 			if(e.getSource() == buttonArray[i]){
+				for(int p = 0; p < 12; p++){
+					selectIngredientNameArray[p].setText("");
+					selectAmountTextArray[p].setText("");
+					selectInfoNameTextField.setText("");
+				}
 				for(Drink d:drinkArray){
 					if(d.getName() == buttonArray[i].getText()){
+						selectInfoNameTextField.setText(d.getName());
 						currentDrink = d;
 						int n = 0;
 						Map<String, Integer> ingredients = d.getIngredients();
@@ -533,7 +585,13 @@ public class ClientGui extends JFrame implements ActionListener{
 		}
 	}
 	
+	
 	@SuppressWarnings("unchecked")
+	/**
+	 * Loads the ingredients currently stored in the file fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 */
 	public void loadIngredients(String fileName) throws FileNotFoundException{
 			userIngredients.clear();
 		try {
@@ -551,6 +609,13 @@ public class ClientGui extends JFrame implements ActionListener{
 		
 	}
 	
+	
+	/**
+	 * Saves the ingredients currently stored in userIngredients
+	 * to fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 */
 	public void saveIngredients (String fileName) throws FileNotFoundException{
 		FileOutputStream fileOut;
 		try {
@@ -567,6 +632,11 @@ public class ClientGui extends JFrame implements ActionListener{
 		
 	}
 	
+	
+	/**
+	 * Clears the current ingredient list. Not in use at the moment.
+	 * @param fileName
+	 */
 	public void clearIngredients (String fileName){
 		userIngredients.clear();
 		
@@ -583,6 +653,12 @@ public class ClientGui extends JFrame implements ActionListener{
 		}
 	}
 	
+	/**
+	 * reInit() is used whenever there is an update to the GUI
+	 * More specifically, it updates both the main button grid
+	 * and the ingredients listed in the Combo box
+	 * @throws FileNotFoundException
+	 */
 	public void reInit() throws FileNotFoundException{
 		int n = 0;
 		for(Drink d:drinkArray){
@@ -591,6 +667,7 @@ public class ClientGui extends JFrame implements ActionListener{
 		}
 		
 		addIngredientDrinkBox.removeAllItems();
+		addIngredientDrinkBox.addItem(new String("                    "));
 		
 		for(String s:userIngredients){
 			addIngredientDrinkBox.addItem(s);
