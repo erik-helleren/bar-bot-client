@@ -64,10 +64,13 @@ public class ClientGui extends JFrame implements ActionListener{
 	JButton editAcceptButton;
 	JButton editResetButton;
 	
+	JPanel ingredientPanelArray[];
+	
 	JTextField infoNameTextField;
 	
 	JTextField ingredientNameArray[];
 	JTextField amountTextArray[];
+	JButton removeIngredientArray[];
 	
 	JTextField addIngredientDataField;
 	JButton addIngredientDataButton;
@@ -361,16 +364,18 @@ public class ClientGui extends JFrame implements ActionListener{
 		/*
 		 * Header text for the Drink creation field
 		 */
-		JPanel ingredientPanelArray[] = new JPanel[13];
+		ingredientPanelArray = new JPanel[13];
 		
 		JLabel nameHeaderLabel = new JLabel("Ingredient");
+		JPanel nameHeaderPanel = new JPanel();
+		nameHeaderPanel.add(nameHeaderLabel);
 		nameHeaderLabel.setPreferredSize(new Dimension(150,20));
 		JLabel sizeHeaderLabel = new JLabel("Size (mL)");
 		JPanel sizeHeaderPanel = new JPanel();
 		sizeHeaderPanel.add(sizeHeaderLabel);
 		
 		ingredientPanelArray[12] = new JPanel(new BorderLayout());
-		ingredientPanelArray[12].add(nameHeaderLabel, BorderLayout.WEST);
+		ingredientPanelArray[12].add(nameHeaderPanel, BorderLayout.WEST);
 		ingredientPanelArray[12].add(sizeHeaderPanel, BorderLayout.CENTER);
 		editIngredientPanel.add(ingredientPanelArray[12]);
 		
@@ -384,7 +389,7 @@ public class ClientGui extends JFrame implements ActionListener{
 		JPanel textPanelArray[] = new JPanel[12];
 		amountTextArray = new JTextField[12];
 		JPanel removePanelArray[] = new JPanel[12];
-		JButton removeIngredientArray[] = new JButton[12];
+		removeIngredientArray = new JButton[12];
 		
 		for (int i = 0; i < 12; i++){
 			
@@ -393,15 +398,19 @@ public class ClientGui extends JFrame implements ActionListener{
 			ingredientNameArray[i] = new JTextField(20);
 			ingredientNameArray[i].setText("");
 			ingredientNameArray[i].setEditable(false);
+			//ingredientNameArray[i].setVisible(false);
 			ingredientNamePanel[i].add(ingredientNameArray[i]);
 			
 			amountTextArray[i] = new JTextField(3);
 			amountTextArray[i].setText("");
+			//amountTextArray[i].setVisible(false);
 			textPanelArray[i] = new JPanel();
 			textPanelArray[i].add(amountTextArray[i]);
 			
 			
 			removeIngredientArray[i] = new JButton("Remove");
+			removeIngredientArray[i].addActionListener(this);
+			//removeIngredientArray[i].setVisible(false);
 			removePanelArray[i] = new JPanel();
 			removePanelArray[i].add(removeIngredientArray[i]);
 			
@@ -409,6 +418,7 @@ public class ClientGui extends JFrame implements ActionListener{
 			ingredientPanelArray[i].add(ingredientNamePanel[i],BorderLayout.WEST);
 			ingredientPanelArray[i].add(textPanelArray[i],BorderLayout.CENTER);
 			ingredientPanelArray[i].add(removePanelArray[i],BorderLayout.EAST);
+			//ingredientPanelArray[i].setVisible(false);
 			editIngredientPanel.add(ingredientPanelArray[i]);
 		}
 		
@@ -535,10 +545,41 @@ public class ClientGui extends JFrame implements ActionListener{
 		else if(e.getSource() == addIngredientDrinkButton){
 			//Takes selected item from combo box, and places it in the ingredient list
 			int n = 0;
-			while(!ingredientNameArray[n].getText().equals("")){
+			while(n < 12 && !ingredientNameArray[n].getText().equals("")){
 				n++;
 			}
-			ingredientNameArray[n].setText(addIngredientDrinkBox.getSelectedItem().toString());
+			if(n < 12){
+				ingredientNameArray[n].setText(addIngredientDrinkBox.getSelectedItem().toString());
+				//ingredientNameArray[n].setVisible(true);
+				//amountTextArray[n].setVisible(true);
+				//removeIngredientArray[n].setVisible(true);
+				//ingredientPanelArray[n].setVisible(true);
+			}
+			
+			if(n >= 11){
+				addIngredientDrinkButton.setEnabled(false);
+			}
+			
+		}
+		
+		for(int i = 0; i < 12; i++){
+			if(e.getSource() == removeIngredientArray[i]){
+				if(!addIngredientDrinkButton.isEnabled()){
+					addIngredientDrinkButton.setEnabled(true);
+				}
+				int m = i;
+				while(m < 11 && !ingredientNameArray[m+1].getText().equals("")){
+					ingredientNameArray[m].setText(ingredientNameArray[m+1].getText());
+					amountTextArray[m].setText(amountTextArray[m+1].getText());
+					m++;
+				}
+				ingredientNameArray[m].setText("");
+				amountTextArray[m].setText("");
+				//ingredientNameArray[m].setVisible(false);
+				//amountTextArray[m].setVisible(false);
+				//removeIngredientArray[m].setVisible(false);
+				//ingredientPanelArray[m].setVisible(false);
+			}
 		}
 		
 		/*
