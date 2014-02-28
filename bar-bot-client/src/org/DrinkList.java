@@ -56,4 +56,12 @@ public class DrinkList {
 			System.err.println("Failed to create output file");
 		}
 	}
+	
+	public void add(Drink drink){
+		drinkList.add(drink);
+	}
+	
+	public Set<Drink> getDrinkSet(){
+		return drinkList;
+	}
 }

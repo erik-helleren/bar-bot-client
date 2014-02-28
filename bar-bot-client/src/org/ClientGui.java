@@ -1,12 +1,34 @@
+package org;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.*;
 
 
 
 public class ClientGui extends JFrame implements ActionListener{
+	
+	DrinkList drinkList;
+	private Set<Drink> drinkArray;
+	Drink currentDrink;
+	
+	static ConfigInterface ci;
+	
+	ArrayList<String> userIngredients;
 	
 	/*
 	 * Overall main panel
@@ -31,6 +53,9 @@ public class ClientGui extends JFrame implements ActionListener{
 	 */
 	JButton selectionAcceptButton;
 	JButton selectionResetButton;
+	JButton buttonArray[];
+	JTextField selectIngredientNameArray[];
+	JTextField selectAmountTextArray[];
 	
 	/*
 	 * Edit Panels, Buttons, etc.
@@ -38,14 +63,32 @@ public class ClientGui extends JFrame implements ActionListener{
 	JButton editAcceptButton;
 	JButton editResetButton;
 	
+	JTextField infoNameTextField;
+	
+	JTextField ingredientNameArray[];
+	JTextField amountTextArray[];
+	
+	JTextField addIngredientDataField;
+	JButton addIngredientDataButton;
+	JButton addIngredientDrinkButton;
+	
+	JComboBox<String> addIngredientDrinkBox;
+	
+	
 	
 	
 	ClientGui(){
+		userIngredients = new ArrayList<String>();
 		setTitle("Bar-Bot");
 		setSize(1000, 700);
 		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
 		setBackground(Color.gray);
 		//setResizable(false);
+		
+		drinkList = new DrinkList();
+		drinkList.loadFromFile("DrinkDatabase");
+    	drinkArray = drinkList.getDrinkSet();
+		
 
 		barbotPanel = new JPanel();
 		barbotPanel.setLayout(new BorderLayout());
@@ -69,9 +112,11 @@ public class ClientGui extends JFrame implements ActionListener{
 		selectionPanel.add(selectionAcceptPanel, BorderLayout.SOUTH);
 		
 		selectionAcceptButton = new JButton("Accept");
+		selectionAcceptButton.addActionListener(this);
 		selectionAcceptPanel.add(selectionAcceptButton, BorderLayout.EAST);
 		
 		selectionResetButton = new JButton("Reset");
+		selectionAcceptButton.addActionListener(this);
 		selectionAcceptPanel.add(selectionResetButton, BorderLayout.WEST);
 		
 		/*
@@ -81,10 +126,16 @@ public class ClientGui extends JFrame implements ActionListener{
 		gridPanel.setLayout(new GridLayout(4,3,3,3));
 		selectionPanel.add(gridPanel, BorderLayout.CENTER);
 		
-		JButton buttonArray[] = new JButton[12];
+		buttonArray = new JButton[12];
 		for (int i = 0; i < 12; i++){
 			buttonArray[i] = new JButton("" + i);
+			buttonArray[i].addActionListener(this);
 			gridPanel.add(buttonArray[i]);
+		}
+		int n = 0;
+		for(Drink d:drinkArray){
+			buttonArray[n].setText(d.getName());
+			n++;
 		}
 	
 		
@@ -122,13 +173,15 @@ public class ClientGui extends JFrame implements ActionListener{
 		JPanel selectIngredientPanelArray[] = new JPanel[13];
 		
 		JLabel selectNameHeaderLabel = new JLabel("Ingredient");
+		JPanel selectNameHeaderPanel = new JPanel();
+		selectNameHeaderPanel.add(selectNameHeaderLabel);
 		selectNameHeaderLabel.setPreferredSize(new Dimension(225,20));
 		JLabel selectSizeHeaderLabel = new JLabel("Size (mL)");
 		JPanel selectSizeHeaderPanel = new JPanel();
 		selectSizeHeaderPanel.add(selectSizeHeaderLabel);
 		
 		selectIngredientPanelArray[12] = new JPanel(new BorderLayout());
-		selectIngredientPanelArray[12].add(selectNameHeaderLabel, BorderLayout.WEST);
+		selectIngredientPanelArray[12].add(selectNameHeaderPanel, BorderLayout.WEST);
 		selectIngredientPanelArray[12].add(selectSizeHeaderPanel, BorderLayout.CENTER);
 		selectIngredientPanel.add(selectIngredientPanelArray[12]);
 		
@@ -138,10 +191,10 @@ public class ClientGui extends JFrame implements ActionListener{
 		 * in the Drink creation field
 		 */
 		JPanel selectIngredientNamePanel[] = new JPanel[12];
-		JTextField selectIngredientNameArray[] = new JTextField[12];
+		selectIngredientNameArray = new JTextField[12];
 		JPanel selectTextPanelArray[] = new JPanel[12];
-		JTextField selectAmountTextArray[] = new JTextField[12];
-		JPanel selectRemovePanelArray[] = new JPanel[12];
+		selectAmountTextArray = new JTextField[12];
+		//JPanel selectRemovePanelArray[] = new JPanel[12];
 		//JButton selectRemoveIngredientArray[] = new JButton[12];
 		
 		for (int i = 0; i < 12; i++){
@@ -198,9 +251,11 @@ public class ClientGui extends JFrame implements ActionListener{
 		editPanel.add(acceptPanel, BorderLayout.SOUTH);
 		
 		editAcceptButton = new JButton("Accept");
+		editAcceptButton.addActionListener(this);
 		acceptPanel.add(editAcceptButton, BorderLayout.EAST);
 		
 		editResetButton = new JButton("Reset");
+		editResetButton.addActionListener(this);
 		acceptPanel.add(editResetButton, BorderLayout.WEST);
 		
 		
@@ -224,11 +279,26 @@ public class ClientGui extends JFrame implements ActionListener{
 		 */
 		JPanel addIngredientDrinkPanel = new JPanel();
 		addIngredientDrinkPanel.setBorder(BorderFactory.createTitledBorder("Add Ingredient to Drink"));
+	
 		
-		JComboBox addIngredientDrinkBox = new JComboBox();
-		addIngredientDrinkBox.addItem(new String("Hello World"));
+		try {
+			loadIngredients("ingredients.txt");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		addIngredientDrinkBox = new JComboBox<String>();
+		addIngredientDrinkBox.addItem(new String("        "));
+		
+		for(String s:userIngredients){
+			addIngredientDrinkBox.addItem(s);
+		}
+		
 		addIngredientDrinkPanel.add(addIngredientDrinkBox);
-		JButton addIngredientDrinkButton = new JButton("Accept");
+		addIngredientDrinkButton = new JButton("Accept");
+		addIngredientDrinkButton.addActionListener(this);
 		addIngredientDrinkPanel.add(addIngredientDrinkButton);
 		addIngredientPanel.add(addIngredientDrinkPanel);
 		
@@ -239,9 +309,10 @@ public class ClientGui extends JFrame implements ActionListener{
 		JPanel addIngredientDataPanel = new JPanel();
 		addIngredientDataPanel.setBorder(BorderFactory.createTitledBorder("Add Ingredient to Database"));
 		
-		JTextField addIngredientDataField = new JTextField(20);
+		addIngredientDataField = new JTextField(20);
 		addIngredientDataPanel.add(addIngredientDataField);
-		JButton addIngredientDataButton = new JButton("Accept");
+		addIngredientDataButton = new JButton("Accept");
+		addIngredientDataButton.addActionListener(this);
 		addIngredientDataPanel.add(addIngredientDataButton);
 		addIngredientPanel.add(addIngredientDataPanel);
 		
@@ -263,7 +334,7 @@ public class ClientGui extends JFrame implements ActionListener{
 		editNamePanel.setLayout(new BorderLayout());
 		editNamePanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		JLabel editNameLabel = new JLabel("Drink Name:");
-		JTextField infoNameTextField = new JTextField(20);
+		infoNameTextField = new JTextField(20);
 		editNamePanel.add(editNameLabel, BorderLayout.WEST);
 		editNamePanel.add(infoNameTextField, BorderLayout.CENTER);
 		informationPanel.add(editNamePanel, BorderLayout.NORTH);
@@ -297,9 +368,9 @@ public class ClientGui extends JFrame implements ActionListener{
 		 * in the Drink creation field
 		 */
 		JPanel ingredientNamePanel[] = new JPanel[12];
-		JTextField ingredientNameArray[] = new JTextField[12];
+		ingredientNameArray = new JTextField[12];
 		JPanel textPanelArray[] = new JPanel[12];
-		JTextField amountTextArray[] = new JTextField[12];
+		amountTextArray = new JTextField[12];
 		JPanel removePanelArray[] = new JPanel[12];
 		JButton removeIngredientArray[] = new JButton[12];
 		
@@ -308,10 +379,12 @@ public class ClientGui extends JFrame implements ActionListener{
 			ingredientPanelArray[i] = new JPanel(new BorderLayout());
 			ingredientNamePanel[i] = new JPanel();
 			ingredientNameArray[i] = new JTextField(20);
+			ingredientNameArray[i].setText("");
 			ingredientNameArray[i].setEditable(false);
 			ingredientNamePanel[i].add(ingredientNameArray[i]);
 			
 			amountTextArray[i] = new JTextField(3);
+			amountTextArray[i].setText("");
 			textPanelArray[i] = new JPanel();
 			textPanelArray[i].add(amountTextArray[i]);
 			
@@ -355,63 +428,15 @@ public class ClientGui extends JFrame implements ActionListener{
 		edit.add(createDrink);
 		
 		
-		
-		
-		
-		
-		/*if(fileimage == null){
-			label = new JLabel();
-		}
-		else{
-			ImageIcon image = new ImageIcon(fileimage);
-			label = new JLabel(image);
-		}*/
-
-		//dot = new ImageIcon("yellowsquare.jpg");
-		//dot2 = new ImageIcon("selectedsquare.jpg");
-		
-		//scrollPane = new JScrollPane();
-		//scrollPane.getViewport().add(label);
-		//panel.add(scrollPane, BorderLayout.CENTER);
-		
-		//scrollPane.getVerticalScrollBar().setUnitIncrement(10);
-	    //scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
-		
-		/*file = new JMenu("File");
-		open = new JMenuItem("Open");
-		open.addActionListener(this);
-		newFile = new JMenuItem("New File");
-		newFile.addActionListener(this);
-		
-		file.add(newFile);
-		file.add(open);
-		
-		viewer = new JMenu("Map Viewer");
-		find = new JMenuItem("Find");
-		find.addActionListener(this); 
-		directions = new JMenuItem("Directions");
-		directions.addActionListener(this);
-		
-		viewer.add(find);
-		viewer.add(directions);
-		
-		menuBar = new JMenuBar();
-		menuBar.add(file);
-		menuBar.add(viewer);
-		setJMenuBar(menuBar);
-		*/
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		//JFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	public static void main(String[] args) {
-    	
+		ci=new dummyConfig("192.168.2.3");
+		
 		ClientGui gui = new ClientGui(); 
     	gui.setVisible(true);
-    	//idCounter = 0;
-    	//pathCounter = 0;
-    	//locationArray = new ArrayList<LocationNode>();
-    	//pathArray = new ArrayList<PathNode>();
+    	
     }
 
 	@Override
@@ -429,6 +454,147 @@ public class ClientGui extends JFrame implements ActionListener{
 			barbotPanel.add(selectionPanel);
 			barbotPanel.remove(editPanel);
 		}
-	} 
+		else if(e.getSource() == selectionAcceptButton){
+			System.out.println("Making Drinks");
+			int a;
+			try {
+				a = ArduinoComunicator.makeDrink(currentDrink, ci);
+				System.out.println("Made 1 drink"+a);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		}
+		else if(e.getSource() == editAcceptButton){
+			Map<String,Integer> newIngredients = new HashMap<>();
+			int i = 0;
+			while(!ingredientNameArray[i].getText().equals("") && !amountTextArray[i].getText().equals("")){
+				newIngredients.put(ingredientNameArray[i].getText(), Integer.parseInt(amountTextArray[i].getText()));
+				i++;
+			}
+			Drink newDrink = new Drink(infoNameTextField.getText(), newIngredients);
+			drinkList.getDrinkSet().add(newDrink);
+			
+			try {
+				reInit();
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		}
+		else if(e.getSource() == addIngredientDataButton){
+			userIngredients.add(addIngredientDataField.getText());
+			try {
+				saveIngredients("ingredients.txt");
+				reInit();
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else if(e.getSource() == addIngredientDrinkButton){
+			int n = 0;
+			while(!ingredientNameArray[n].getText().equals("")){
+				n++;
+			}
+			ingredientNameArray[n].setText(addIngredientDrinkBox.getSelectedItem().toString());
+		}
+		
+		for(int i = 0; i < 12; i++){
+			if(e.getSource() == buttonArray[i]){
+				for(Drink d:drinkArray){
+					if(d.getName() == buttonArray[i].getText()){
+						currentDrink = d;
+						int n = 0;
+						Map<String, Integer> ingredients = d.getIngredients();
+						//Set<Entry<String,Integer>> mapSet = ingredients.entrySet();
+						//Iterator<Entry<String,Integer>> mapIterator = mapSet.iterator();
+						//while(mapIterator.hasNext()){
+							//Entry<String, Integer> mapEntry = mapIterator.next();
+							//String keyValue = mapEntry.getKey();
+							//Integer value = Integer.parseInt(mapEntry.getValue());
+							//System.out.println(keyValue + " " + value);
+						//}
+						for(String s:ingredients.keySet()){
+							selectIngredientNameArray[n].setText(s);
+							//long value = ((long)d.getIngredients().get(s));
+							//System.out.println(d.getIngredients().get(s));
+							//selectAmountTextArray[n].setText("" + value);
+							n++;
+						}
+						//for(Integer k:d.getIngredients().keySet().){
+						//	selectAmountTextArray[n].setText(k.toString());
+						//}
+					}
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void loadIngredients(String fileName) throws FileNotFoundException{
+			userIngredients.clear();
+		try {
+			FileInputStream fileIn = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			userIngredients = (ArrayList<String>) in.readObject();
+			in.close();
+			fileIn.close();
+			
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void saveIngredients (String fileName) throws FileNotFoundException{
+		FileOutputStream fileOut;
+		try {
+			fileOut = new FileOutputStream(fileName);
+			ObjectOutputStream out= new ObjectOutputStream(fileOut);
+			out.writeObject(userIngredients);
+			out.close();
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+	}
+	
+	public void clearIngredients (String fileName){
+		userIngredients.clear();
+		
+		FileOutputStream fileOut;
+		try {
+			fileOut = new FileOutputStream(fileName);
+			ObjectOutputStream out= new ObjectOutputStream(fileOut);
+			out.writeObject(userIngredients);
+			out.close();
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void reInit() throws FileNotFoundException{
+		int n = 0;
+		for(Drink d:drinkArray){
+			buttonArray[n].setText(d.getName());
+			n++;
+		}
+		
+		addIngredientDrinkBox.removeAllItems();
+		
+		for(String s:userIngredients){
+			addIngredientDrinkBox.addItem(s);
+		}
+	}
 	
 }
