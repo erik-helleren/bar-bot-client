@@ -1,4 +1,4 @@
-package org;
+//package org;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -8,9 +8,8 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.*;
+import org.json.simple.parser.*;
 
 public class DrinkList {
 	Set<Drink> drinkList;
@@ -32,7 +31,7 @@ public class DrinkList {
 				
 				try {
 					drinkList.add(new Drink((JSONObject)parser.parse(line)));
-				} catch (ParseException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					System.err.println("JSON file curoupted");
 				}
