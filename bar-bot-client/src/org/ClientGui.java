@@ -209,9 +209,11 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 		searchPanel.setBorder(BorderFactory.createTitledBorder("Search Drink Database"));
 		drinkSelectionPanel.add(searchPanel, BorderLayout.NORTH);
 		
-		searchTextField = new JTextField();
+		searchTextField = new JTextField(24);
 		searchTextField.addKeyListener(this);
-		searchPanel.add(searchTextField, BorderLayout.NORTH);
+		JPanel searchTextPanel = new JPanel(new BorderLayout());
+		searchTextPanel.add(searchTextField, BorderLayout.WEST);
+		searchPanel.add(searchTextPanel, BorderLayout.NORTH);
 		
 		searchResultsTextArea = new JTextArea();
 		searchResultsTextArea.setEditable(false);
@@ -853,6 +855,14 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 		}
 		else if(e.getSource() == editDrinkComboBox){
 			if(editDrinkComboBox.getSelectedItem() != null){
+				if(editDrinkComboBox.getSelectedItem().toString().equals("Make a New Drink")){
+					for(int i = 0; i < 12; i++){
+					infoNameTextField.setText("");
+					ingredientNameArray[i].setText("");
+					amountTextArray[i].setText("");
+					}
+					return;
+				}
 				for(Drink d:drinkArray){
 					if(d.getName().equals(editDrinkComboBox.getSelectedItem().toString())){
 						infoNameTextField.setText(d.getName());
