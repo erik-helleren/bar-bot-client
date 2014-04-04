@@ -1,4 +1,4 @@
-//package org;
+package org;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,8 +37,17 @@ public class Drink implements Comparable<Drink>{
 	public Map<String,Integer> getIngredients(){
 		return this.ingredients;
 	}
+	
+	public void setIngredients(Map<String,Integer> ingredients){
+		this.ingredients = ingredients;
+	}
+	
 	public String getName(){
 		return this.name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
 	}
 	/**
 	 * checks to see if this Drink can be made using the fluids that are

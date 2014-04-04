@@ -1,4 +1,4 @@
-//package org;
+package org;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -90,6 +91,7 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 	JButton addIngredientDataButton;
 	JButton addIngredientDrinkButton;
 	
+	JComboBox<String> editDrinkComboBox;
 	JComboBox<String> addIngredientDrinkBox;
 	
 	/*
@@ -378,7 +380,7 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 		 * to the drink creator
 		 */
 		JPanel addIngredientDrinkPanel = new JPanel();
-		addIngredientDrinkPanel.setBorder(BorderFactory.createTitledBorder("Add Ingredient to Drink"));
+		addIngredientDrinkPanel.setBorder(BorderFactory.createTitledBorder("Make or Edit a Drink"));
 	
 		
 		try {
@@ -387,6 +389,13 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 			e.printStackTrace();
 		}
 		
+		editDrinkComboBox = new JComboBox<String>();
+		editDrinkComboBox.addItem(new String("Make a New Drink"));
+		for(Drink d:drinkArray){
+			editDrinkComboBox.addItem(d.getName());
+		}
+		editDrinkComboBox.addActionListener(this);
+		addIngredientDrinkPanel.add(editDrinkComboBox);
 		
 		addIngredientDrinkBox = new JComboBox<String>();
 		addIngredientDrinkBox.addItem(new String("                    "));
@@ -750,15 +759,45 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 			 * screen and creates a JSON drink object with it.
 			 * Selection Page buttons are updated from here
 			 */
-			Map<String,Integer> newIngredients = new HashMap<>();
-			int i = 0;
-			while(!ingredientNameArray[i].getText().equals("") && !amountTextArray[i].getText().equals("")){
-				newIngredients.put(ingredientNameArray[i].getText(), Integer.parseInt(amountTextArray[i].getText()));
-				i++;
+			
+			if(editDrinkComboBox.getSelectedItem().toString().equals("Make a New Drink")){
+				Map<String,Integer> newIngredients = new HashMap<>();
+				int i = 0;
+				while(!ingredientNameArray[i].getText().equals("") && !amountTextArray[i].getText().equals("")){
+					newIngredients.put(ingredientNameArray[i].getText(), Integer.parseInt(amountTextArray[i].getText()));
+					i++;
+				}
+				Drink newDrink = new Drink(infoNameTextField.getText(), newIngredients);
+				drinkList.getDrinkSet().add(newDrink);
+				drinkList.writeToFile("DrinkDatabase");
+				
 			}
-			Drink newDrink = new Drink(infoNameTextField.getText(), newIngredients);
-			drinkList.getDrinkSet().add(newDrink);
-			drinkList.writeToFile("DrinkDatabase");
+			else{
+				Set<Drink> temp = new HashSet<>();
+				for(Drink d:drinkArray){
+					if(editDrinkComboBox.getSelectedItem().equals(d.getName())){
+						temp.add(d);
+						//d.getIngredients().clear();
+						Map<String,Integer> newIngredients = new HashMap<>();
+						int i = 0;
+						while(!ingredientNameArray[i].getText().equals("") && !amountTextArray[i].getText().equals("")){
+							newIngredients.put(ingredientNameArray[i].getText(), Integer.parseInt(amountTextArray[i].getText()));
+							i++;
+						}
+						Drink newDrink = new Drink(infoNameTextField.getText(), newIngredients);
+						drinkList.getDrinkSet().remove(d);
+						drinkList.getDrinkSet().add(newDrink);
+						drinkList.writeToFile("DrinkDatabase");
+						break;
+						
+					}
+					else if(d.getName().equals(infoNameTextField.getText())){
+						JOptionPane.showMessageDialog(editPanel, "Eggs are not supposed to be green.");
+						return;
+					}
+				}
+				//drinkArray.remove(temp);
+			}
 			
 			try {
 				reInit();
@@ -811,6 +850,23 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 				addIngredientDrinkButton.setEnabled(false);
 			}
 			
+		}
+		else if(e.getSource() == editDrinkComboBox){
+			if(editDrinkComboBox.getSelectedItem() != null){
+				for(Drink d:drinkArray){
+					if(d.getName().equals(editDrinkComboBox.getSelectedItem().toString())){
+						infoNameTextField.setText(d.getName());
+						currentDrink = d;
+						int n = 0;
+						Map<String, Integer> ingredients = d.getIngredients();
+						for(String s:ingredients.keySet()){
+							ingredientNameArray[n].setText(s);
+							amountTextArray[n].setText("" + ingredients.get(s));
+							n++;
+						}
+					}
+				}
+			}
 		}
 		
 		for(int i = 0; i < 12; i++){
@@ -985,8 +1041,12 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 	 * @throws FileNotFoundException
 	 */
 	public void reInit() throws FileNotFoundException{
+		editDrinkComboBox.removeAllItems();
+		editDrinkComboBox.addItem(new String("Make a New Drink"));
+		
 		int n = 0;
 		for(Drink d:drinkArray){
+			editDrinkComboBox.addItem(d.getName());
 			buttonArray[n].setText(d.getName());
 			n++;
 		}
@@ -996,6 +1056,13 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 		
 		for(String s:userIngredients){
 			addIngredientDrinkBox.addItem(s);
+		}
+		for(int i = 0; i < 12; i++){	
+			ingredientConfigComboBox[i].removeAllItems();
+			ingredientConfigComboBox[i].addItem(new String("N/A"));
+			for(String s:userIngredients){
+				ingredientConfigComboBox[i].addItem(s);
+			}
 		}
 	}
 
