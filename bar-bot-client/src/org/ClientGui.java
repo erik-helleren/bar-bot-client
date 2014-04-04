@@ -3,6 +3,8 @@ package org;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,7 +22,7 @@ import javax.swing.*;
 
 
 
-public class ClientGui extends JFrame implements ActionListener{
+public class ClientGui extends JFrame implements ActionListener, KeyListener{
 	
 	DrinkList drinkList;
 	private Set<Drink> drinkArray;
@@ -40,6 +42,7 @@ public class ClientGui extends JFrame implements ActionListener{
 	 */
 	JMenuItem createDrink;
 	JMenuItem selectDrink;
+	JMenuItem configWindow;
 	
 	/*
 	 * These are the panels for Drink Selection and 
@@ -47,6 +50,7 @@ public class ClientGui extends JFrame implements ActionListener{
 	 */
 	JPanel selectionPanel;
 	JPanel editPanel;
+	JPanel configPanel;
 	
 	/*
 	 * Selection Panels, Buttons, etc.
@@ -57,6 +61,16 @@ public class ClientGui extends JFrame implements ActionListener{
 	JTextField selectInfoNameTextField;
 	JTextField selectIngredientNameArray[];
 	JTextField selectAmountTextArray[];
+	
+	/*
+	 * Search 
+	 */
+	JTextField searchTextField;
+	JTextArea searchResultsTextArea;
+	JRadioButton searchByNameButton;
+    JRadioButton searchByIngredientButton;
+	JList searchResultsList;
+	DefaultListModel<String> searchListModel;
 	
 	/*
 	 * Edit Panels, Buttons, etc.
@@ -78,6 +92,17 @@ public class ClientGui extends JFrame implements ActionListener{
 	
 	JComboBox<String> addIngredientDrinkBox;
 	
+	/*
+	 * Config Panels, Buttons, etc.
+	 */
+	JButton configAcceptButton;
+	JButton configResetButton;
+	
+	JPanel configPanelArray[];
+	
+	JComboBox<String> ingredientConfigComboBox[];
+	
+	JTextField ipConfigTextField;
 	
 	
 	
@@ -113,9 +138,14 @@ public class ClientGui extends JFrame implements ActionListener{
 		editPanel.setVisible(false);
 		barbotPanel.add(editPanel);
 		
+		configPanel = new JPanel();
+		configPanel.setLayout(new BorderLayout());
+		barbotPanel.add(configPanel);
+		
 		selectionPanel = new JPanel();
 		selectionPanel.setLayout( new BorderLayout()); 
 		barbotPanel.add(selectionPanel);
+		
 		
 		
 		//*************************************************************************************
@@ -142,11 +172,20 @@ public class ClientGui extends JFrame implements ActionListener{
 		selectionAcceptPanel.add(selectionResetButton, BorderLayout.WEST);
 		
 		/*
+		 * Panel for holding the Drink Grid
+		 * and the Search box
+		 */
+		JPanel drinkSelectionPanel = new JPanel();
+		drinkSelectionPanel.setLayout(new BorderLayout());
+		selectionPanel.add(drinkSelectionPanel, BorderLayout.CENTER);
+		
+		
+		/*
 		 * Panel for Drink Grid
 		 */
 		JPanel gridPanel = new JPanel();
 		gridPanel.setLayout(new GridLayout(4,3,3,3));
-		selectionPanel.add(gridPanel, BorderLayout.CENTER);
+		drinkSelectionPanel.add(gridPanel, BorderLayout.CENTER);
 		
 		buttonArray = new JButton[12];
 		for (int i = 0; i < 12; i++){
@@ -159,7 +198,52 @@ public class ClientGui extends JFrame implements ActionListener{
 			buttonArray[n].setText(d.getName());
 			n++;
 		}
-	
+		
+		/*
+		 * Panel for Search box
+		 */
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new BorderLayout());
+		searchPanel.setBorder(BorderFactory.createTitledBorder("Search Drink Database"));
+		drinkSelectionPanel.add(searchPanel, BorderLayout.NORTH);
+		
+		searchTextField = new JTextField();
+		searchTextField.addKeyListener(this);
+		searchPanel.add(searchTextField, BorderLayout.NORTH);
+		
+		searchResultsTextArea = new JTextArea();
+		searchResultsTextArea.setEditable(false);
+		searchResultsTextArea.setRows(5);
+		searchResultsTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		
+		JPanel searchResultPanel = new JPanel();
+		searchResultPanel.setLayout(new BorderLayout());
+		searchPanel.add(searchResultPanel, BorderLayout.WEST);
+		
+		//Create the radio buttons.
+	    searchByNameButton = new JRadioButton("Name");
+	    searchByNameButton.setSelected(true);
+
+	    searchByIngredientButton = new JRadioButton("Ingredients");
+	    ButtonGroup searchByGroup = new ButtonGroup();
+	    
+	    searchByGroup.add(searchByNameButton);
+	    searchByGroup.add(searchByIngredientButton);
+	    
+	    JPanel searchByPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    searchByPanel.add(new JLabel("Search by: "));
+	    searchByPanel.add(searchByNameButton);
+	    searchByPanel.add(searchByIngredientButton);
+	    searchResultPanel.add(searchByPanel, BorderLayout.NORTH);
+		
+		searchListModel = new DefaultListModel();
+		searchResultsList = new JList(searchListModel);
+		searchResultsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		searchResultsList.addKeyListener(this);
+		JScrollPane searchScrollPane = new JScrollPane();
+		searchScrollPane.setPreferredSize(new Dimension(50,100));
+		searchScrollPane.setViewportView(searchResultsList);
+		searchResultPanel.add(searchScrollPane, BorderLayout.CENTER);
 		
 		/*
 		 * Information Panel that resides on the right side of the screen
@@ -435,6 +519,128 @@ public class ClientGui extends JFrame implements ActionListener{
 		descriptionPanel.add(infoDescriptionTextArea, BorderLayout.CENTER);
 		informationPanel.add(descriptionPanel, BorderLayout.SOUTH);
 		
+		
+		//*************************************************************************************
+		/*
+		 * End of Edit Panel code. Beginning of Config Panel code
+		 */
+		//*************************************************************************************
+				
+		//ci = new dummyConfig("");
+		//try {
+		//	loadConfiguration("config.txt");
+		//} catch (FileNotFoundException e) {
+		//	// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
+		
+		/*
+		 * Accept and Cancel Button Panel
+		 */
+		
+		JPanel configAcceptPanel = new JPanel();
+		configAcceptPanel.setLayout(new BorderLayout());
+		configPanel.add(configAcceptPanel, BorderLayout.SOUTH);
+		
+		configAcceptButton = new JButton("Accept");
+		configAcceptButton.addActionListener(this);
+		configAcceptPanel.add(configAcceptButton, BorderLayout.EAST);
+		
+		configResetButton = new JButton("Reset");
+		configResetButton.addActionListener(this);
+		configAcceptPanel.add(configResetButton, BorderLayout.WEST);
+		
+		/*
+		 * Information Editing Panel that resides on the right side of the screen
+		 * Contains the drink's DRINK NAME, INGREDIENTS, and DESCRIPTION 
+		 */
+		JPanel arduinoConfigPanel = new JPanel();
+		arduinoConfigPanel.setLayout(new BorderLayout());
+		arduinoConfigPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		arduinoConfigPanel.setBorder(BorderFactory.createTitledBorder("Arduino Configuration"));
+		configPanel.add(arduinoConfigPanel, BorderLayout.WEST);
+		
+		
+		JPanel ipConfigPanel = new JPanel();
+		ipConfigPanel.setLayout(new BorderLayout());
+		ipConfigPanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
+		JLabel ipConfigLabel = new JLabel("IP Address:");
+		ipConfigTextField = new JTextField(20);
+		ipConfigPanel.add(ipConfigLabel, BorderLayout.WEST);
+		ipConfigPanel.add(ipConfigTextField, BorderLayout.CENTER);
+		arduinoConfigPanel.add(ipConfigPanel, BorderLayout.NORTH);
+		
+		
+		JPanel ingredientConfigPanel = new JPanel();
+		ingredientConfigPanel.setLayout(new BoxLayout(ingredientConfigPanel, BoxLayout.PAGE_AXIS));
+		ingredientConfigPanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 10));
+		arduinoConfigPanel.add(ingredientConfigPanel, BorderLayout.CENTER);
+		
+		
+		/*
+		 * Header text for the Drink creation field
+		 */
+		configPanelArray = new JPanel[13];
+		
+		JLabel pumpHeaderLabel = new JLabel("");//Pump #");
+		JPanel pumpHeaderPanel = new JPanel();
+		pumpHeaderPanel.add(pumpHeaderLabel);
+		pumpHeaderLabel.setPreferredSize(new Dimension(150,20));
+		JLabel ingredientHeaderLabel = new JLabel("");//Ingredient");
+		JPanel ingredientHeaderPanel = new JPanel();
+		ingredientHeaderPanel.add(ingredientHeaderLabel);
+		
+		configPanelArray[12] = new JPanel(new BorderLayout());
+		configPanelArray[12].add(pumpHeaderPanel, BorderLayout.WEST);
+		configPanelArray[12].add(ingredientHeaderPanel, BorderLayout.CENTER);
+		ingredientConfigPanel.add(configPanelArray[12]);
+		
+		
+		/*
+		 * Handles the Labels, textfields, and remove buttons
+		 * in the Drink creation field
+		 */
+		JPanel pumpPanelArray[] = new JPanel[12];
+		
+		JPanel comboPanelArray[] = new JPanel[12];
+		ingredientConfigComboBox = new JComboBox[12];
+		
+		for (int i = 0; i < 12; i++){
+			
+			configPanelArray[i] = new JPanel(new BorderLayout());
+			pumpPanelArray[i] = new JPanel();
+			JLabel pumpNumLabel = new JLabel();
+			pumpNumLabel.setText("Pump #" + (i+1));
+			pumpPanelArray[i].add(pumpNumLabel);
+			//ingredientNamePanel[i] = new JPanel();
+			//ingredientNameArray[i] = new JTextField(20);
+			//ingredientNameArray[i].setText("");
+			//ingredientNameArray[i].setEditable(false);
+			//ingredientNameArray[i].setVisible(false);
+			//ingredientNamePanel[i].add(ingredientNameArray[i]);
+			
+			ingredientConfigComboBox[i] = new JComboBox<String>();
+			ingredientConfigComboBox[i].addItem("N/A");
+			
+			for(String s:userIngredients){
+				ingredientConfigComboBox[i].addItem(s);
+			}
+			
+			
+			//amountTextArray[i].setVisible(false);
+			comboPanelArray[i] = new JPanel();
+			comboPanelArray[i].add(ingredientConfigComboBox[i]);
+			
+			
+	
+			configPanelArray[i].add(pumpPanelArray[i],BorderLayout.WEST);
+			configPanelArray[i].add(comboPanelArray[i],BorderLayout.CENTER);
+			//ingredientPanelArray[i].setVisible(false);
+			ingredientConfigPanel.add(configPanelArray[i]);
+		}
+		
+		
+		
 		/*
 		 * Menu Bar
 		 */
@@ -452,6 +658,10 @@ public class ClientGui extends JFrame implements ActionListener{
 		createDrink.addActionListener(this);
 		edit.add(createDrink);
 		
+		configWindow = new JMenuItem("Config");
+		configWindow.addActionListener(this);
+		edit.add(configWindow);
+		
 		/*
 		 * Shuts down the java process when the window is closed
 		 */
@@ -461,7 +671,7 @@ public class ClientGui extends JFrame implements ActionListener{
 	public static void main(String[] args) {
 		//This is temporary. The GUI will probably have
 		//a config tab where this can be freely edited.
-		ci=new dummyConfig("192.168.2.3");
+		//ci=new dummyConfig("192.168.2.3");
 		
 		//Starting the GUI here
 		ClientGui gui = new ClientGui(); 
@@ -478,15 +688,34 @@ public class ClientGui extends JFrame implements ActionListener{
 			//Switch to Create Drink view
 			selectionPanel.setVisible(false);
 			editPanel.setVisible(true);
+			configPanel.setVisible(false);
 			barbotPanel.remove(selectionPanel);
 			barbotPanel.add(editPanel);
+			barbotPanel.remove(configPanel);
 		}
 		else if(e.getSource() == selectDrink){
 			//Switch to Select Drink view
 			selectionPanel.setVisible(true);
 			editPanel.setVisible(false);
+			configPanel.setVisible(false);
 			barbotPanel.add(selectionPanel);
 			barbotPanel.remove(editPanel);
+			barbotPanel.remove(configPanel);
+		}
+		else if(e.getSource() == configWindow){
+			//Switch to the Configuration Window
+			selectionPanel.setVisible(false);
+			editPanel.setVisible(false);
+			configPanel.setVisible(true);
+			barbotPanel.remove(selectionPanel);
+			barbotPanel.remove(editPanel);
+			barbotPanel.add(configPanel);
+			
+		}
+		else if(e.getSource() == searchTextField){
+			//Handles search actions
+			//searchResultsTextArea.setText(searchTextField.getText());
+			//barbotPanel.update(getGraphics());
 		}
 		else if(e.getSource() == selectionAcceptButton){
 			/*
@@ -494,10 +723,19 @@ public class ClientGui extends JFrame implements ActionListener{
 			 * Takes selected drink, and sends creation
 			 * data to the Arduino
 			 */
+			Map<String,Integer> newIngredients = new HashMap<>();
+			int i = 0;
+			while(!selectIngredientNameArray[i].getText().equals("") && !selectAmountTextArray[i].getText().equals("")){
+				newIngredients.put(selectIngredientNameArray[i].getText(), Integer.parseInt(selectAmountTextArray[i].getText()));
+				//System.out.println(ci.getPumpID(selectIngredientNameArray[i].getText()) + " " + selectIngredientNameArray[i].getText());
+				i++;
+			}
+			Drink newDrink = new Drink(selectInfoNameTextField.getText(), newIngredients);
+			
 			System.out.println("Making Drinks");
 			int a;
 			try {
-				a = ArduinoComunicator.makeDrink(currentDrink, ci);
+				a = ArduinoComunicator.makeDrink(newDrink, ci);
 				System.out.println("Made 1 drink"+a);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
@@ -529,6 +767,19 @@ public class ClientGui extends JFrame implements ActionListener{
 				e1.printStackTrace();
 			}
 			
+		}
+		else if(e.getSource() == configAcceptButton){
+			//System.out.println("HI");
+			ci = new dummyConfig(ipConfigTextField.getText());
+			for(int i = 0; i < 12; i++){
+				ci.setPumpID(i,ingredientConfigComboBox[i].getSelectedItem().toString());
+			}
+		//	try {
+		//		saveConfiguration("config.txt");
+		//	} catch (FileNotFoundException e1) {
+		//		// TODO Auto-generated catch block
+		//		e1.printStackTrace();
+		//	}
 		}
 		else if(e.getSource() == addIngredientDataButton){
 			//Updates Ingredient ComboBox with addIngredientDataField
@@ -602,24 +853,11 @@ public class ClientGui extends JFrame implements ActionListener{
 						currentDrink = d;
 						int n = 0;
 						Map<String, Integer> ingredients = d.getIngredients();
-						//Set<Entry<String,Integer>> mapSet = ingredients.entrySet();
-						//Iterator<Entry<String,Integer>> mapIterator = mapSet.iterator();
-						//while(mapIterator.hasNext()){
-							//Entry<String, Integer> mapEntry = mapIterator.next();
-							//String keyValue = mapEntry.getKey();
-							//Integer value = Integer.parseInt(mapEntry.getValue());
-							//System.out.println(keyValue + " " + value);
-						//}
 						for(String s:ingredients.keySet()){
 							selectIngredientNameArray[n].setText(s);
-							//long value = ((long)d.getIngredients().get(s));
-							//System.out.println(d.getIngredients().get(s));
-							//selectAmountTextArray[n].setText("" + value);
+							selectAmountTextArray[n].setText("" + ingredients.get(s));
 							n++;
 						}
-						//for(Integer k:d.getIngredients().keySet().){
-						//	selectAmountTextArray[n].setText(k.toString());
-						//}
 					}
 				}
 			}
@@ -694,6 +932,52 @@ public class ClientGui extends JFrame implements ActionListener{
 		}
 	}
 	
+	/*@SuppressWarnings("unchecked")
+	*//**
+	 * Loads the ingredients currently stored in the file fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 *//*
+	public void loadConfiguration(String fileName) throws FileNotFoundException{
+		ci.clear();
+		try {
+			FileInputStream fileIn = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			ci =  (ConfigInterface) in.readObject();
+			in.close();
+			fileIn.close();
+			
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
+	*//**
+	 * Saves the ingredients currently stored in userIngredients
+	 * to fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 *//*
+	public void saveConfiguration (String fileName) throws FileNotFoundException{
+		FileOutputStream fileOut;
+		try {
+			fileOut = new FileOutputStream(fileName);
+			ObjectOutputStream out= new ObjectOutputStream(fileOut);
+			out.writeObject(ci);
+			out.close();
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+	}
+	*/
 	/**
 	 * reInit() is used whenever there is an update to the GUI
 	 * More specifically, it updates both the main button grid
@@ -713,6 +997,89 @@ public class ClientGui extends JFrame implements ActionListener{
 		for(String s:userIngredients){
 			addIngredientDrinkBox.addItem(s);
 		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		if(arg0.getKeyCode()==KeyEvent.VK_DOWN){
+			//if(searchResultsList.getSelectedIndex()<0){
+				
+			//}
+			//if(searchResultsList.getComponentCount()>=searchResultsList.getSelectedIndex()){
+				searchResultsList.setSelectedIndex(searchResultsList.getSelectedIndex()+1);
+				searchResultsList.ensureIndexIsVisible(searchResultsList.getSelectedIndex());
+			//}
+		}
+		else if(arg0.getKeyCode()==KeyEvent.VK_UP){
+			if(searchResultsList.getSelectedIndex()<=0){
+				searchTextField.requestFocusInWindow();
+			}
+			else{
+				searchResultsList.setSelectedIndex(searchResultsList.getSelectedIndex()-1);
+				searchResultsList.ensureIndexIsVisible(searchResultsList.getSelectedIndex());
+			}
+		}
+		else if(arg0.getKeyCode()==KeyEvent.VK_ENTER){
+			if(searchResultsList.getSelectedIndex()>=0){
+				for(int p = 0; p < 12; p++){
+					selectIngredientNameArray[p].setText("");
+					selectAmountTextArray[p].setText("");
+					selectInfoNameTextField.setText("");
+				}
+				for(Drink d:drinkArray){
+					if(d.getName() == searchResultsList.getSelectedValue()){
+						selectInfoNameTextField.setText(d.getName());
+						currentDrink = d;
+						int n = 0;
+						Map<String, Integer> ingredients = d.getIngredients();
+						for(String s:ingredients.keySet()){
+							selectIngredientNameArray[n].setText(s);
+							selectAmountTextArray[n].setText("" + ingredients.get(s));
+							n++;
+						}
+					}
+				}
+			}
+		}
+		else{
+			if(searchTextField.getText().equals("")){
+				searchResultsTextArea.setText("");
+				searchListModel.removeAllElements();
+				//System.out.println("HELLO");
+				return;
+			}
+			searchListModel.removeAllElements();
+			String s = new String();
+			for(Drink d:drinkArray){
+				if(searchByNameButton.isSelected()){
+					if(d.getName().toLowerCase().indexOf(searchTextField.getText().toLowerCase()) != -1){
+						s = s + d.getName() + "\n";
+						searchListModel.addElement(d.getName());
+					}
+				}
+				else{
+					for(String ingredient:d.getIngredients().keySet()){
+						if(ingredient.toLowerCase().indexOf(searchTextField.getText().toLowerCase()) != -1){
+							searchListModel.addElement(d.getName());
+						}
+					}
+				}
+			}
+			searchResultsTextArea.setText(s);
+		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

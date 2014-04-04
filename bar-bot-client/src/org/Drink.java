@@ -28,7 +28,10 @@ public class Drink implements Comparable<Drink>{
 	public Drink(JSONObject jsonObject){
 		thisJSON=jsonObject;
 		this.name=(String) thisJSON.get("DrinkName");
-		ingredients=(Map) thisJSON.get("Ingredients");
+		JSONObject ingJSON = new JSONObject();
+		ingJSON = (JSONObject) thisJSON.get("Ingredients");
+		Map<String,Integer> ingredientMap = (Map<String, Integer>)ingJSON;
+		ingredients=ingredientMap;//(Map<String, Integer>) thisJSON.get("Ingredients");
 	}
 	
 	public Map<String,Integer> getIngredients(){
