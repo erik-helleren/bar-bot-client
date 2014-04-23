@@ -50,4 +50,34 @@ public class ArduinoComunicator {
 		return returned;
 	}
 	
+	public static byte[] checkDrinkStatus(short id, ConfigInterface ci) throws Exception{
+		byte[] returned= new byte[100];
+		byte[] toSend;
+		toSend = new byte[3];
+		toSend[0] = 3;
+		toSend[1] = (byte)(id >> 8);
+		toSend[2] = (byte)(id);
+		
+		try (   Socket kkSocket = new Socket(ci.getArduinoIP(), port);)
+	    {
+			kkSocket.setSoTimeout(timeout);
+			kkSocket.getOutputStream().write(toSend);
+			
+	        try{
+	        	kkSocket.getInputStream().read(returned);//will block untill a byte is read or
+	        		//timeout is reached
+	        }catch(java.net.SocketTimeoutException e){
+	        	e.printStackTrace();
+	        }
+	    } catch (UnknownHostException e) {
+			e.printStackTrace();
+			System.err.println("Unable to connect to arduino");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returned;
+	}
+	
+	//public static int transmit
 }
