@@ -91,7 +91,7 @@ public class ClientController {
 			Drink newDrink = new Drink(s_view.getDrinkName(), newIngredients);
 			
 			System.out.println("Making Drinks");
-			int a;
+			byte[] a;
 			try {
 				a = ArduinoComunicator.makeDrink(newDrink, model.getConfigInterface());
 				System.out.println("Made 1 drink"+a);
@@ -281,12 +281,12 @@ public class ClientController {
 
 		public void actionPerformed(ActionEvent arg0) {
 			if(e_view.getDrinkComboBox() != null){
+				for(int i = 0; i < 12; i++){
+					e_view.setIngredientName(i, "");
+					e_view.setAmount(i, "");
+					e_view.setDrinkName("");
+				}
 				if(e_view.getDrinkComboBox().toString().equals("Make a New Drink")){
-					for(int i = 0; i < 12; i++){
-						e_view.setIngredientName(i, "");
-						e_view.setAmount(i, "");
-						e_view.setDrinkName("");
-					}
 					return;
 				}
 				Drink d = model.getDrink(e_view.getDrinkComboBox().toString());
@@ -328,20 +328,22 @@ public class ClientController {
 
 		public void actionPerformed(ActionEvent e) {
 			//Takes selected item from combo box, and places it in the ingredient list
-			int n = 0;
-			while(n < 12 && !e_view.getIngredientName(n).equals("")){//ingredientNameArray[n].getText().equals("")){
-				n++;
-			}
-			if(n < 12){
-				e_view.setIngredientName(n, e_view.getIngredientComboBox().toString());//ingredientNameArray[n].setText(addIngredientDrinkBox.getSelectedItem().toString());
-				//ingredientNameArray[n].setVisible(true);
-				//amountTextArray[n].setVisible(true);
-				//removeIngredientArray[n].setVisible(true);
-				//ingredientPanelArray[n].setVisible(true);
-			}
-			
-			if(n >= 11){
-				e_view.enableAddIngredientButton(false);//addIngredientDrinkButton.setEnabled(false);
+			if(!e_view.getIngredientComboBox().equals("                    ")){
+				int n = 0;
+				while(n < 12 && !e_view.getIngredientName(n).equals("")){//ingredientNameArray[n].getText().equals("")){
+					n++;
+				}
+				if(n < 12){
+					e_view.setIngredientName(n, e_view.getIngredientComboBox().toString());//ingredientNameArray[n].setText(addIngredientDrinkBox.getSelectedItem().toString());
+					//ingredientNameArray[n].setVisible(true);
+					//amountTextArray[n].setVisible(true);
+					//removeIngredientArray[n].setVisible(true);
+					//ingredientPanelArray[n].setVisible(true);
+				}
+				
+				if(n >= 11){
+					e_view.enableAddIngredientButton(false);//addIngredientDrinkButton.setEnabled(false);
+				}
 			}
 		}
 		

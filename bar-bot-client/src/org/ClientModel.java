@@ -1,5 +1,6 @@
 package org;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -104,17 +105,20 @@ public class ClientModel {
 	
 	public void loadIngredients(String fileName) throws FileNotFoundException{
 		userIngredients.clear();
-		try {
-			FileInputStream fileIn = new FileInputStream(fileName);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			userIngredients = (ArrayList<String>) in.readObject();
-			in.close();
-			fileIn.close();
-			
-			
-		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		File f = new File(fileName);
+		if(f.exists() && !f.isDirectory()){
+			try {
+				FileInputStream fileIn = new FileInputStream(fileName);
+				ObjectInputStream in = new ObjectInputStream(fileIn);
+				userIngredients = (ArrayList<String>) in.readObject();
+				in.close();
+				fileIn.close();
+				
+				
+			} catch (IOException | ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	
 	}
