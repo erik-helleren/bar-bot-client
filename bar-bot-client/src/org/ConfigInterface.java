@@ -9,10 +9,14 @@ public interface ConfigInterface {
 	 */
 	public int getPumpID(String name);
 	
+	public void setPumpID(int id, String name);
+	
 	/**
 	 * return the arduino's ip address.
 	 * @return
 	 */
 	public String getArduinoIP();
+
+	public void clear();
 	
 }

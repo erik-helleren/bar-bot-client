@@ -1,4 +1,4 @@
-//package org;
+package org;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,14 +28,26 @@ public class Drink implements Comparable<Drink>{
 	public Drink(JSONObject jsonObject){
 		thisJSON=jsonObject;
 		this.name=(String) thisJSON.get("DrinkName");
-		ingredients=(Map) thisJSON.get("Ingredients");
+		JSONObject ingJSON = new JSONObject();
+		ingJSON = (JSONObject) thisJSON.get("Ingredients");
+		Map<String,Integer> ingredientMap = (Map<String, Integer>)ingJSON;
+		ingredients=ingredientMap;//(Map<String, Integer>) thisJSON.get("Ingredients");
 	}
 	
 	public Map<String,Integer> getIngredients(){
 		return this.ingredients;
 	}
+	
+	public void setIngredients(Map<String,Integer> ingredients){
+		this.ingredients = ingredients;
+	}
+	
 	public String getName(){
 		return this.name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
 	}
 	/**
 	 * checks to see if this Drink can be made using the fluids that are

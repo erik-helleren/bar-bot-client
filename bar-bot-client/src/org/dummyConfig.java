@@ -21,10 +21,23 @@ public class dummyConfig implements ConfigInterface {
 		}
 		return out;
 	}
+	
+	@Override
+	public void setPumpID(int id, String name) {
+		pairings.put(name, id);
+	}
 
 	@Override
 	public String getArduinoIP() {
 		return arduinoIP;
 	}
+	
+	public void clear(){
+		pairings.clear();
+		arduinoIP = "";
+		counter = 0;
+	}
+	
+	
 
 }
