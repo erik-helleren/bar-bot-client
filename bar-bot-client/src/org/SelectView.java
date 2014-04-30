@@ -97,6 +97,7 @@ public class SelectView extends JPanel{
 		 * for Drink Selection
 		 */
 		JPanel selectionAcceptPanel = new JPanel();
+		selectionAcceptPanel.setBackground(ClientMain.bgc);
 		selectionAcceptPanel.setLayout(new BorderLayout());
 		/*selectionPanel.*/add(selectionAcceptPanel, BorderLayout.SOUTH);
 		
@@ -113,6 +114,7 @@ public class SelectView extends JPanel{
 		 * and the Search box
 		 */
 		JPanel drinkSelectionPanel = new JPanel();
+		drinkSelectionPanel.setBackground(ClientMain.bgc);
 		drinkSelectionPanel.setLayout(new BorderLayout());
 		/*selectionPanel.*/add(drinkSelectionPanel, BorderLayout.CENTER);
 		

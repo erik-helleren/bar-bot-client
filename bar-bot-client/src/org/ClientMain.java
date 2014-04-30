@@ -6,7 +6,8 @@ import java.awt.Color;
 import javax.swing.*;
 
 public class ClientMain {
-
+	public static Color bgc = new Color(190,190,255);
+	public static Color fgc = Color.BLACK;
 	/**
 	 * @param args
 	 */
@@ -32,7 +33,16 @@ public class ClientMain {
 		backing.setLayout(new BorderLayout());
 		overhead.getContentPane().add(backing);
 		JTabbedPane panel = new JTabbedPane();
-		//backing.setBackground(Color.LIGHT_GRAY);
+		backing.setBackground(bgc);
+		panel.setBackground(bgc);
+		s_view.setBackground(bgc);
+		c_view.setBackground(bgc);
+		e_view.setBackground(bgc);
+		s_view.setForeground(fgc);
+		e_view.setForeground(fgc);
+		c_view.setForeground(fgc);
+		backing.setForeground(fgc);
+		panel.setForeground(fgc);
 		panel.addTab("Select Drink", s_view);
 		panel.addTab("Edit Drinks", e_view);
 		panel.addTab("Configuration", c_view);
