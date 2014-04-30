@@ -1,4 +1,4 @@
-//package org;
+package org;
 
 public interface ConfigInterface {
 	/**
