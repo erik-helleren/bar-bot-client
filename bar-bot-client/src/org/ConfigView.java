@@ -38,28 +38,28 @@ public class ConfigView extends JPanel{
 	ConfigView(ClientModel model){
 		
 		//setTitle("Bar-Bot");
-		setSize(1000, 700);
+		//setMinimumSize(new Dimension(1000, 700));
 		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
-		setBackground(Color.gray);
+		//setBackground(Color.LIGHT_GRAY);
 		//setResizable(false);
 		
-		
+		/*
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		/*getContentPane().*/add(barbotPanel);
+		/*getContentPane().add(barbotPanel);
 		
 		configPanel = new JPanel();
 		configPanel.setLayout( new BorderLayout());
 		barbotPanel.add(configPanel);
-		
-		
+		*/
+		setLayout(new BorderLayout());
 		/*
 		 * Accept and Cancel Button Panel
 		 */
 		
 		JPanel configAcceptPanel = new JPanel();
 		configAcceptPanel.setLayout(new BorderLayout());
-		configPanel.add(configAcceptPanel, BorderLayout.SOUTH);
+		/*configPanel.*/add(configAcceptPanel, BorderLayout.SOUTH);
 		
 		configAcceptButton = new JButton("Accept");
 		//configAcceptButton.addActionListener(this);
@@ -77,7 +77,7 @@ public class ConfigView extends JPanel{
 		arduinoConfigPanel.setLayout(new BorderLayout());
 		arduinoConfigPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		arduinoConfigPanel.setBorder(BorderFactory.createTitledBorder("Arduino Configuration"));
-		configPanel.add(arduinoConfigPanel, BorderLayout.WEST);
+		/*configPanel.*/add(arduinoConfigPanel, BorderLayout.WEST);
 		
 		
 		JPanel ipConfigPanel = new JPanel();

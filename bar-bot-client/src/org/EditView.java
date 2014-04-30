@@ -55,19 +55,21 @@ public class EditView extends JPanel{
 		//*************************************************************************************
 		
 		//setTitle("Bar-Bot");
-		//setSize(1000, 700);
+		setMinimumSize(new Dimension(1000, 700));
 		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
-		setBackground(Color.gray);
+		//setBackground(Color.LIGHT_GRAY);
 		//setResizable(false);
-		
+		/*
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		/*getContentPane().*/add(barbotPanel);
+		/*getContentPane().add(barbotPanel);
 		
 		editPanel = new JPanel();
 		editPanel.setLayout( new BorderLayout());
 		editPanel.setVisible(true);
 		barbotPanel.add(editPanel);
+		*/
+		setLayout(new BorderLayout());
 		
 		
 		/*
@@ -76,7 +78,7 @@ public class EditView extends JPanel{
 		
 		JPanel acceptPanel = new JPanel();
 		acceptPanel.setLayout(new BorderLayout());
-		editPanel.add(acceptPanel, BorderLayout.SOUTH);
+		/*editPanel.*/add(acceptPanel, BorderLayout.SOUTH);
 		
 		editAcceptButton = new JButton("Accept");
 		acceptPanel.add(editAcceptButton, BorderLayout.EAST);
@@ -152,7 +154,7 @@ public class EditView extends JPanel{
 		informationPanel.setBorder(BorderFactory.createTitledBorder("Make a Drink"));
 		editDrinkPanel.add(informationPanel);
 		
-		editPanel.add(editDrinkPanel, BorderLayout.WEST);
+		/*editPanel.*/add(editDrinkPanel, BorderLayout.WEST);
 		
 		JPanel editNamePanel = new JPanel();
 		editNamePanel.setLayout(new BorderLayout());

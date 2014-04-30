@@ -7,11 +7,15 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -65,9 +69,9 @@ public class SelectView extends JPanel{
 	
 
 		//setTitle("Bar-Bot");
-		setSize(1000, 700);
+		setMinimumSize(new Dimension(1000, 700));
 		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
-		setBackground(Color.gray);
+		//setBackground(Color.LIGHT_GRAY);
 		//setResizable(false);
 		
 		
@@ -76,15 +80,16 @@ public class SelectView extends JPanel{
 		 * Beginning of Selection Panel code
 		 */
 		//*************************************************************************************
-		
+		/*
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		/*getContentPane().*/add(barbotPanel);
+		/*getContentPane().add(barbotPanel);
 
 		selectionPanel = new JPanel();
 		selectionPanel.setLayout( new BorderLayout()); 
-		barbotPanel.add(selectionPanel);
+		barbotPanel.add(selectionPanel);*/
 		
+		setLayout(new BorderLayout());
 		
 		
 		/*
@@ -93,7 +98,7 @@ public class SelectView extends JPanel{
 		 */
 		JPanel selectionAcceptPanel = new JPanel();
 		selectionAcceptPanel.setLayout(new BorderLayout());
-		selectionPanel.add(selectionAcceptPanel, BorderLayout.SOUTH);
+		/*selectionPanel.*/add(selectionAcceptPanel, BorderLayout.SOUTH);
 		
 		selectionAcceptButton = new JButton("Accept");
 		//selectionAcceptButton.addActionListener(this);
@@ -109,7 +114,7 @@ public class SelectView extends JPanel{
 		 */
 		JPanel drinkSelectionPanel = new JPanel();
 		drinkSelectionPanel.setLayout(new BorderLayout());
-		selectionPanel.add(drinkSelectionPanel, BorderLayout.CENTER);
+		/*selectionPanel.*/add(drinkSelectionPanel, BorderLayout.CENTER);
 		
 		
 		/*
@@ -122,6 +127,15 @@ public class SelectView extends JPanel{
 		buttonArray = new JButton[12];
 		for (int i = 0; i < 12; i++){
 			buttonArray[i] = new JButton("" + i);
+			try {
+				buttonArray[i].setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + System.getProperty("file.separator")
+															+ "img" + System.getProperty("file.separator")
+															+ "Hello World.png"))));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			//buttonArray[i].setBorder(BorderFactory.createEmptyBorder());
+			//buttonArray[i].setContentAreaFilled(false);
 			if(!model.getDrinkName(i).equals("")){
 				buttonArray[i].setText(model.getDrinkName(i));
 			}
@@ -190,7 +204,7 @@ public class SelectView extends JPanel{
 		selectionInformationPanel.setLayout(new BorderLayout());
 		selectionInformationPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		selectionInformationPanel.setBorder(BorderFactory.createTitledBorder("Drink Information"));
-		selectionPanel.add(selectionInformationPanel, BorderLayout.EAST);
+		/*selectionPanel.*/add(selectionInformationPanel, BorderLayout.EAST);
 		
 		
 		JPanel selectNamePanel = new JPanel();
@@ -388,9 +402,9 @@ public class SelectView extends JPanel{
 	}
 	
 	void addWindowSwitchListener(ActionListener e){
-		selectDrink.addActionListener(e);
-		createDrink.addActionListener(e);
-		configWindow.addActionListener(e);
+		//selectDrink.addActionListener(e);
+		//createDrink.addActionListener(e);
+		//configWindow.addActionListener(e);
 	}
 	
 	
