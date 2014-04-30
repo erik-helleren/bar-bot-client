@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class EditView extends JFrame{
+public class EditView extends JPanel{
 	
 	JPanel editPanel;
 	
@@ -54,15 +54,15 @@ public class EditView extends JFrame{
 		 */
 		//*************************************************************************************
 		
-		setTitle("Bar-Bot");
-		setSize(1000, 700);
-		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+		//setTitle("Bar-Bot");
+		//setSize(1000, 700);
+		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
 		setBackground(Color.gray);
 		//setResizable(false);
 		
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		getContentPane().add(barbotPanel);
+		/*getContentPane().*/add(barbotPanel);
 		
 		editPanel = new JPanel();
 		editPanel.setLayout( new BorderLayout());
@@ -97,7 +97,7 @@ public class EditView extends JFrame{
 		 */
 		JPanel addIngredientPanel = new JPanel();
 		addIngredientPanel.setLayout(new BoxLayout(addIngredientPanel, BoxLayout.PAGE_AXIS));
-		addIngredientPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		addIngredientPanel.setPreferredSize(new Dimension(400, 0));
 		
 		/*
 		 * Contains items for adding ingredients
@@ -148,7 +148,7 @@ public class EditView extends JFrame{
 		 */
 		JPanel informationPanel = new JPanel();
 		informationPanel.setLayout(new BorderLayout());
-		informationPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		informationPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		informationPanel.setBorder(BorderFactory.createTitledBorder("Make a Drink"));
 		editDrinkPanel.add(informationPanel);
 		
@@ -247,7 +247,7 @@ public class EditView extends JFrame{
 		
 		/*
 		 * Menu Bar
-		 */
+		 *
 		JMenuBar menuBar = new JMenuBar();
 		barbotPanel.add(menuBar, BorderLayout.NORTH);
 		
@@ -265,8 +265,8 @@ public class EditView extends JFrame{
 		configWindow = new JMenuItem("Config");
 		//configWindow.addActionListener(this);
 		edit.add(configWindow);
-		
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		*/
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
 	

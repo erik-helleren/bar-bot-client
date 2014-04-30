@@ -17,7 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class ConfigView extends JFrame{
+public class ConfigView extends JPanel{
 	
 
 	JPanel configPanel;
@@ -37,16 +37,16 @@ public class ConfigView extends JFrame{
 
 	ConfigView(ClientModel model){
 		
-		setTitle("Bar-Bot");
+		//setTitle("Bar-Bot");
 		setSize(1000, 700);
-		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
 		setBackground(Color.gray);
 		//setResizable(false);
 		
 		
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		getContentPane().add(barbotPanel);
+		/*getContentPane().*/add(barbotPanel);
 		
 		configPanel = new JPanel();
 		configPanel.setLayout( new BorderLayout());
@@ -75,7 +75,7 @@ public class ConfigView extends JFrame{
 		 */
 		JPanel arduinoConfigPanel = new JPanel();
 		arduinoConfigPanel.setLayout(new BorderLayout());
-		arduinoConfigPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		arduinoConfigPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		arduinoConfigPanel.setBorder(BorderFactory.createTitledBorder("Arduino Configuration"));
 		configPanel.add(arduinoConfigPanel, BorderLayout.WEST);
 		
@@ -162,6 +162,7 @@ public class ConfigView extends JFrame{
 		/*
 		 * Menu Bar
 		 */
+		/*
 		JMenuBar menuBar = new JMenuBar();
 		barbotPanel.add(menuBar, BorderLayout.NORTH);
 		
@@ -179,8 +180,8 @@ public class ConfigView extends JFrame{
 		configWindow = new JMenuItem("Config");
 		//configWindow.addActionListener(this);
 		edit.add(configWindow);
-		
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		*/
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	String getIP(){

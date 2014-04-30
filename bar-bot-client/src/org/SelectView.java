@@ -26,7 +26,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
-public class SelectView extends JFrame{
+public class SelectView extends JPanel{
 
 
 	JPanel selectionPanel;
@@ -64,9 +64,9 @@ public class SelectView extends JFrame{
 		clientModel = model;
 	
 
-		setTitle("Bar-Bot");
+		//setTitle("Bar-Bot");
 		setSize(1000, 700);
-		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
 		setBackground(Color.gray);
 		//setResizable(false);
 		
@@ -79,7 +79,7 @@ public class SelectView extends JFrame{
 		
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		getContentPane().add(barbotPanel);
+		/*getContentPane().*/add(barbotPanel);
 
 		selectionPanel = new JPanel();
 		selectionPanel.setLayout( new BorderLayout()); 
@@ -188,7 +188,7 @@ public class SelectView extends JFrame{
 		 */
 		JPanel selectionInformationPanel = new JPanel();
 		selectionInformationPanel.setLayout(new BorderLayout());
-		selectionInformationPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		selectionInformationPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		selectionInformationPanel.setBorder(BorderFactory.createTitledBorder("Drink Information"));
 		selectionPanel.add(selectionInformationPanel, BorderLayout.EAST);
 		
@@ -272,7 +272,7 @@ public class SelectView extends JFrame{
 		
 		/*
 		 * Menu Bar
-		 */
+		 *
 		JMenuBar menuBar = new JMenuBar();
 		barbotPanel.add(menuBar, BorderLayout.NORTH);
 		
@@ -290,8 +290,8 @@ public class SelectView extends JFrame{
 		configWindow = new JMenuItem("Config");
 		//configWindow.addActionListener(this);
 		edit.add(configWindow);
-		
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		*/
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			
 	}
 	
