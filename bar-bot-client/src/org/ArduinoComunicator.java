@@ -26,8 +26,8 @@ public class ArduinoComunicator {
 	 * @return the code returned by the arduino, currently a single byte to ack or deny the drink order.
 	 * @throws Exception 
 	 */
-	public static int makeDrink(Drink toMake,ConfigInterface ci) throws Exception{
-		int returned=-1;
+	public static byte[] makeDrink(Drink toMake,ConfigInterface ci) throws Exception{
+		byte[] returned= new byte[100];
 		byte[] toSend=toMake.getByteArray(ci);
 		try (   Socket kkSocket = new Socket(ci.getArduinoIP(), port);)
 	    {
@@ -35,7 +35,7 @@ public class ArduinoComunicator {
 			kkSocket.getOutputStream().write(toSend);
 			
 	        try{
-	        	returned=kkSocket.getInputStream().read();//will block untill a byte is read or
+	        	kkSocket.getInputStream().read(returned);//will block untill a byte is read or
 	        		//timeout is reached
 	        }catch(java.net.SocketTimeoutException e){
 	        	e.printStackTrace();
@@ -54,7 +54,7 @@ public class ArduinoComunicator {
 		byte[] returned= new byte[100];
 		byte[] toSend;
 		toSend = new byte[3];
-		toSend[0] = 3;
+		toSend[0] = 0x03;
 		toSend[1] = (byte)(id >> 8);
 		toSend[2] = (byte)(id);
 		
@@ -78,6 +78,57 @@ public class ArduinoComunicator {
 		}
 		return returned;
 	}
+	
+	public static boolean submitPassword(byte[] pw, ConfigInterface ci) throws Exception {
+		byte[] returned= new byte[100];
+		
+		try (   Socket kkSocket = new Socket(ci.getArduinoIP(), port);)
+	    {
+			kkSocket.setSoTimeout(timeout);
+			kkSocket.getOutputStream().write(pw);
+			
+	        try{
+	        	kkSocket.getInputStream().read(returned);//will block untill a byte is read or
+	        		//timeout is reached
+	        }catch(java.net.SocketTimeoutException e){
+	        	e.printStackTrace();
+	        }
+	    } catch (UnknownHostException e) {
+			e.printStackTrace();
+			System.err.println("Unable to connect to arduino");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returned[0] == 0xfe;
+	}
+	
+	public static byte[] checkStatus(ConfigInterface ci) throws Exception {
+		byte[] returned= new byte[100];
+		byte[] toSend = new byte[1];
+		toSend[0] = 0x00;
+		
+		try (   Socket kkSocket = new Socket(ci.getArduinoIP(), port);)
+	    {
+			kkSocket.setSoTimeout(timeout);
+			kkSocket.getOutputStream().write(toSend);
+			
+	        try{
+	        	kkSocket.getInputStream().read(returned);//will block untill a byte is read or
+	        		//timeout is reached
+	        }catch(java.net.SocketTimeoutException e){
+	        	e.printStackTrace();
+	        }
+	    } catch (UnknownHostException e) {
+			e.printStackTrace();
+			System.err.println("Unable to connect to arduino");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returned;
+	}
+	
 	
 	//public static int transmit
 }
