@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -59,6 +61,7 @@ public class SelectView extends JPanel{
 	JMenuItem createDrink;
 	JMenuItem configWindow;
 	
+	public static String imageDirectory = System.getProperty("user.dir") + System.getProperty("file.separator") + "img";
 	
 	private ClientModel clientModel;
 	
@@ -130,10 +133,21 @@ public class SelectView extends JPanel{
 		for (int i = 0; i < 12; i++){
 			buttonArray[i] = new JButton("" + i);
 			try {
-				buttonArray[i].setIcon(new ImageIcon(ImageIO.read(new File(System.getProperty("user.dir") + System.getProperty("file.separator")
-															+ "img" + System.getProperty("file.separator")
-															+ "Hello World.png"))));
+				buttonArray[i].setIcon(new ImageIcon(ImageIO.read(new File(imageDirectory + System.getProperty("file.separator") + "default.png"))));
 			} catch (IOException e) {
+				BufferedImage defaultImage = new BufferedImage(100,100, BufferedImage.TYPE_INT_ARGB);
+				Graphics2D page = (Graphics2D) defaultImage.getGraphics();
+				page.setColor(Color.PINK);
+				page.fillRect(0,0,100,100);
+				page.setColor(Color.MAGENTA.darker());
+				page.drawLine(25,25,75,75);
+				page.drawLine(25,75,75,25);
+				try {
+					ImageIO.write(defaultImage, "png", new File(imageDirectory + System.getProperty("file.separator") + "default.png"));
+				} catch (IOException c) {
+					c.printStackTrace();
+				}
+				buttonArray[i].setIcon(new ImageIcon(defaultImage));
 				e.printStackTrace();
 			}
 			//buttonArray[i].setBorder(BorderFactory.createEmptyBorder());
