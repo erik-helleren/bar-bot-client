@@ -36,7 +36,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 
 public class SelectView extends JPanel{
-
+	public static final boolean USE_ICONS = false;
 
 	JPanel selectionPanel;
 	
@@ -138,28 +138,32 @@ public class SelectView extends JPanel{
 		
 		buttonArray = new JButton[12];
 		for (int i = 0; i < 12; i++){
-			buttonArray[i] = new JButton("" + i){
-				public void paintComponent(Graphics _page) {
-					super.paintComponent(_page);
-					Graphics2D page = (Graphics2D) _page;
-					BufferedImage icon;
-					try {
-						icon = ImageIO.read(new File(imageDirectory + System.getProperty("file.separator") + "default.png"));
-					} catch (IOException e) {
-						e.printStackTrace();
-						icon = new BufferedImage(100,100, BufferedImage.TYPE_INT_ARGB);
-						Graphics2D ipage = (Graphics2D) icon.getGraphics();
-						ipage.setColor(Color.PINK);
-						ipage.fillRect(0,0,100,100);
-						ipage.setColor(Color.MAGENTA.darker());
-						ipage.drawLine(25,25,75,75);
-						ipage.drawLine(25,75,75,25);
+			if(USE_ICONS) {
+				buttonArray[i] = new JButton("" + i){
+					public void paintComponent(Graphics _page) {
+						super.paintComponent(_page);
+						Graphics2D page = (Graphics2D) _page;
+						BufferedImage icon;
+						try {
+							icon = ImageIO.read(new File(imageDirectory + System.getProperty("file.separator") + "default.png"));
+						} catch (IOException e) {
+							e.printStackTrace();
+							icon = new BufferedImage(100,100, BufferedImage.TYPE_INT_ARGB);
+							Graphics2D ipage = (Graphics2D) icon.getGraphics();
+							ipage.setColor(Color.PINK);
+							ipage.fillRect(0,0,100,100);
+							ipage.setColor(Color.MAGENTA.darker());
+							ipage.drawLine(25,25,75,75);
+							ipage.drawLine(25,75,75,25);
+						}
+						Dimension d = getSize();
+						page.drawImage(icon, 0, 0, d.width, d.height, null);
+						//page.setFont(new Font();
 					}
-					Dimension d = getSize();
-					page.drawImage(icon, 0, 0, d.width, d.height, null);
-					//page.setFont(new Font();
-				}
-			};
+				};
+			} else {
+				buttonArray[i] = new JButton("" + i);
+			}
 			buttonArray[i].setBackground(ClientMain.bbgc);
 			/*try {
 				buttonArray[i].setIcon(new ImageIcon(ImageIO.read(new File(imageDirectory + System.getProperty("file.separator") + "default.png"))));

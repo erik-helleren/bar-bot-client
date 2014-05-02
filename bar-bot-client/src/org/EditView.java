@@ -3,6 +3,7 @@ package org;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 
@@ -12,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -45,6 +47,8 @@ public class EditView extends JPanel{
 	JMenuItem selectDrink;
 	JMenuItem createDrink;
 	JMenuItem configWindow;
+	
+	JList<String> ingredientList;
 	
 
 	EditView(ClientModel model){
@@ -115,6 +119,7 @@ public class EditView extends JPanel{
 			editDrinkComboBox.addItem(model.getDrinkName(n));
 			n++;
 		}
+		editDrinkComboBox.setMaximumRowCount(10);
 		addIngredientDrinkPanel.add(editDrinkComboBox);
 		
 		addIngredientDrinkBox = new JComboBox<String>();
@@ -134,12 +139,26 @@ public class EditView extends JPanel{
 		 * to the database
 		 */
 		JPanel addIngredientDataPanel = new JPanel();
+		addIngredientDataPanel.setLayout(new BorderLayout(0,10));
 		addIngredientDataPanel.setBorder(BorderFactory.createTitledBorder("Add Ingredient to Database"));
+		JPanel addIngredientEntryPanel = new JPanel();
+		addIngredientEntryPanel.setLayout(new FlowLayout());
 		
 		addIngredientDataField = new JTextField(20);
-		addIngredientDataPanel.add(addIngredientDataField);
+		addIngredientDataField.setBackground(ClientMain.tbgc);
+		addIngredientDataField.setForeground(ClientMain.tfgc);
+		addIngredientEntryPanel.add(addIngredientDataField);
 		addIngredientDataButton = new JButton("Accept");
-		addIngredientDataPanel.add(addIngredientDataButton);
+		addIngredientEntryPanel.add(addIngredientDataButton);
+		addIngredientDataPanel.add(addIngredientEntryPanel, BorderLayout.NORTH);
+		
+		ingredientList = new JList<String>();
+		ingredientList.setBackground(ClientMain.tgbgc);
+		ingredientList.setForeground(ClientMain.tfgc);
+		
+		addIngredientDataPanel.add(ingredientList, BorderLayout.CENTER);
+		
+		
 		addIngredientPanel.add(addIngredientDataPanel);
 		
 		editDrinkPanel.add(addIngredientPanel);
@@ -161,6 +180,8 @@ public class EditView extends JPanel{
 		editNamePanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		JLabel editNameLabel = new JLabel("Drink Name:");
 		infoNameTextField = new JTextField(20);
+		infoNameTextField.setBackground(ClientMain.tbgc);
+		infoNameTextField.setForeground(ClientMain.tfgc);
 		editNamePanel.add(editNameLabel, BorderLayout.WEST);
 		editNamePanel.add(infoNameTextField, BorderLayout.CENTER);
 		informationPanel.add(editNamePanel, BorderLayout.NORTH);
@@ -207,12 +228,16 @@ public class EditView extends JPanel{
 			ingredientPanelArray[i] = new JPanel(new BorderLayout());
 			ingredientNamePanel[i] = new JPanel();
 			ingredientNameArray[i] = new JTextField(20);
+			ingredientNameArray[i].setBackground(ClientMain.tgbgc);
+			ingredientNameArray[i].setForeground(ClientMain.tfgc);
 			ingredientNameArray[i].setText("");
 			ingredientNameArray[i].setEditable(false);
 			//ingredientNameArray[i].setVisible(false);
 			ingredientNamePanel[i].add(ingredientNameArray[i]);
 			
 			amountTextArray[i] = new JTextField(3);
+			amountTextArray[i].setBackground(ClientMain.tbgc);
+			amountTextArray[i].setForeground(ClientMain.tfgc);
 			amountTextArray[i].setText("");
 			//amountTextArray[i].setVisible(false);
 			textPanelArray[i] = new JPanel();
@@ -240,6 +265,8 @@ public class EditView extends JPanel{
 		JPanel descriptionPanel = new JPanel(new BorderLayout());
 		JLabel descriptionLabel = new JLabel("Drink Description:");
 		JTextArea infoDescriptionTextArea = new JTextArea();
+		infoDescriptionTextArea.setBackground(ClientMain.tbgc);
+		infoDescriptionTextArea.setForeground(ClientMain.tfgc);
 		infoDescriptionTextArea.setRows(5);
 		infoDescriptionTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		descriptionPanel.add(descriptionLabel, BorderLayout.NORTH);

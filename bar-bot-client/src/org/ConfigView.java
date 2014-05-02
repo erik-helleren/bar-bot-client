@@ -85,6 +85,8 @@ public class ConfigView extends JPanel{
 		ipConfigPanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		JLabel ipConfigLabel = new JLabel("IP Address:");
 		ipConfigTextField = new JTextField(20);
+		ipConfigTextField.setBackground(ClientMain.tbgc);
+		ipConfigTextField.setForeground(ClientMain.tfgc);
 		ipConfigPanel.add(ipConfigLabel, BorderLayout.WEST);
 		ipConfigPanel.add(ipConfigTextField, BorderLayout.CENTER);
 		arduinoConfigPanel.add(ipConfigPanel, BorderLayout.NORTH);
