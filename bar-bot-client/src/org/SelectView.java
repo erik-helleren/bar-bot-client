@@ -4,8 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -52,6 +55,7 @@ public class SelectView extends JPanel{
 	 */
 	JTextField searchTextField;
 	JTextArea searchResultsTextArea;
+	JTextArea statusTextArea;
 	JRadioButton searchByNameButton;
     JRadioButton searchByIngredientButton;
 	JList searchResultsList;
@@ -105,10 +109,12 @@ public class SelectView extends JPanel{
 		/*selectionPanel.*/add(selectionAcceptPanel, BorderLayout.SOUTH);
 		
 		selectionAcceptButton = new JButton("Accept");
+		selectionAcceptButton.setBackground(ClientMain.cbgc);
 		//selectionAcceptButton.addActionListener(this);
 		selectionAcceptPanel.add(selectionAcceptButton, BorderLayout.EAST);
 		
 		selectionResetButton = new JButton("Reset");
+		selectionResetButton.setBackground(ClientMain.cbgc);
 		//selectionAcceptButton.addActionListener(this);
 		selectionAcceptPanel.add(selectionResetButton, BorderLayout.WEST);
 		
@@ -117,7 +123,7 @@ public class SelectView extends JPanel{
 		 * and the Search box
 		 */
 		JPanel drinkSelectionPanel = new JPanel();
-		drinkSelectionPanel.setBackground(ClientMain.bgc);
+		//drinkSelectionPanel.setBackground(ClientMain.bgc);
 		drinkSelectionPanel.setLayout(new BorderLayout());
 		/*selectionPanel.*/add(drinkSelectionPanel, BorderLayout.CENTER);
 		
@@ -126,13 +132,36 @@ public class SelectView extends JPanel{
 		 * Panel for Drink Grid
 		 */
 		JPanel gridPanel = new JPanel();
+		//gridPanel.setBackground(ClientMain.bgc);
 		gridPanel.setLayout(new GridLayout(4,3,3,3));
 		drinkSelectionPanel.add(gridPanel, BorderLayout.CENTER);
 		
 		buttonArray = new JButton[12];
 		for (int i = 0; i < 12; i++){
-			buttonArray[i] = new JButton("" + i);
-			try {
+			buttonArray[i] = new JButton("" + i){
+				public void paintComponent(Graphics _page) {
+					super.paintComponent(_page);
+					Graphics2D page = (Graphics2D) _page;
+					BufferedImage icon;
+					try {
+						icon = ImageIO.read(new File(imageDirectory + System.getProperty("file.separator") + "default.png"));
+					} catch (IOException e) {
+						e.printStackTrace();
+						icon = new BufferedImage(100,100, BufferedImage.TYPE_INT_ARGB);
+						Graphics2D ipage = (Graphics2D) icon.getGraphics();
+						ipage.setColor(Color.PINK);
+						ipage.fillRect(0,0,100,100);
+						ipage.setColor(Color.MAGENTA.darker());
+						ipage.drawLine(25,25,75,75);
+						ipage.drawLine(25,75,75,25);
+					}
+					Dimension d = getSize();
+					page.drawImage(icon, 0, 0, d.width, d.height, null);
+					//page.setFont(new Font();
+				}
+			};
+			buttonArray[i].setBackground(ClientMain.bbgc);
+			/*try {
 				buttonArray[i].setIcon(new ImageIcon(ImageIO.read(new File(imageDirectory + System.getProperty("file.separator") + "default.png"))));
 			} catch (IOException e) {
 				BufferedImage defaultImage = new BufferedImage(100,100, BufferedImage.TYPE_INT_ARGB);
@@ -149,7 +178,7 @@ public class SelectView extends JPanel{
 				}
 				buttonArray[i].setIcon(new ImageIcon(defaultImage));
 				e.printStackTrace();
-			}
+			}*/
 			//buttonArray[i].setBorder(BorderFactory.createEmptyBorder());
 			//buttonArray[i].setContentAreaFilled(false);
 			if(!model.getDrinkName(i).equals("")){
@@ -168,27 +197,45 @@ public class SelectView extends JPanel{
 		 * Panel for Search box
 		 */
 		JPanel searchPanel = new JPanel();
-		searchPanel.setLayout(new BorderLayout());
+		//searchPanel.setBackground(ClientMain.bgc);
+		searchPanel.setLayout(new BorderLayout(10,0));
 		searchPanel.setBorder(BorderFactory.createTitledBorder("Search Drink Database"));
 		drinkSelectionPanel.add(searchPanel, BorderLayout.NORTH);
 		
 		searchTextField = new JTextField(24);
+		searchTextField.setBackground(ClientMain.tbgc);
+		searchTextField.setForeground(ClientMain.tfgc);
 		//searchTextField.addKeyListener(this);
 		JPanel searchTextPanel = new JPanel(new BorderLayout());
+		//searchTextPanel.setBackground(ClientMain.bgc);
 		searchTextPanel.add(searchTextField, BorderLayout.WEST);
 		searchPanel.add(searchTextPanel, BorderLayout.NORTH);
 		
 		searchResultsTextArea = new JTextArea();
+		searchResultsTextArea.setBackground(ClientMain.tgbgc);
+		searchResultsTextArea.setForeground(ClientMain.tfgc);
 		searchResultsTextArea.setEditable(false);
 		searchResultsTextArea.setRows(5);
 		searchResultsTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		JPanel searchResultPanel = new JPanel();
+		//searchResultPanel.setBackground(ClientMain.bgc);
 		searchResultPanel.setLayout(new BorderLayout());
 		searchPanel.add(searchResultPanel, BorderLayout.WEST);
 		
+		statusTextArea = new JTextArea();
+		statusTextArea.setBackground(ClientMain.tgbgc);
+		statusTextArea.setForeground(ClientMain.tfgc);
+		statusTextArea.setEditable(false);
+		statusTextArea.setRows(8);
+		statusTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		
+		
+		searchPanel.add(statusTextArea, BorderLayout.CENTER);
+		
 		//Create the radio buttons.
 	    searchByNameButton = new JRadioButton("Name");
+	    //searchByNameButton.setBackground(ClientMain.cbgc);
 	    searchByNameButton.setSelected(true);
 
 	    searchByIngredientButton = new JRadioButton("Ingredients");
@@ -198,6 +245,7 @@ public class SelectView extends JPanel{
 	    searchByGroup.add(searchByIngredientButton);
 	    
 	    JPanel searchByPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    //searchByPanel.setBackground(ClientMain.bgc);
 	    searchByPanel.add(new JLabel("Search by: "));
 	    searchByPanel.add(searchByNameButton);
 	    searchByPanel.add(searchByIngredientButton);
@@ -205,6 +253,8 @@ public class SelectView extends JPanel{
 		
 		searchListModel = new DefaultListModel();
 		searchResultsList = new JList(searchListModel);
+		searchResultsList.setBackground(ClientMain.tgbgc);
+		searchResultsList.setForeground(ClientMain.tfgc);
 		searchResultsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		//searchResultsList.addKeyListener(this);
 		JScrollPane searchScrollPane = new JScrollPane();
@@ -217,6 +267,7 @@ public class SelectView extends JPanel{
 		 * Contains the drink's DRINK NAME, INGREDIENTS, and DESCRIPTION 
 		 */
 		JPanel selectionInformationPanel = new JPanel();
+		//selectionInformationPanel.setBackground(ClientMain.bgc);
 		selectionInformationPanel.setLayout(new BorderLayout());
 		selectionInformationPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		selectionInformationPanel.setBorder(BorderFactory.createTitledBorder("Drink Information"));
@@ -224,10 +275,13 @@ public class SelectView extends JPanel{
 		
 		
 		JPanel selectNamePanel = new JPanel();
+		//selectNamePanel.setBackground(ClientMain.bgc);
 		selectNamePanel.setLayout(new BorderLayout());
 		selectNamePanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		JLabel selectNameLabel = new JLabel("Drink Name:");
 		selectInfoNameTextField = new JTextField(20);
+		selectInfoNameTextField.setBackground(ClientMain.tgbgc);
+		selectInfoNameTextField.setForeground(ClientMain.tfgc);
 		selectInfoNameTextField.setEditable(false);
 		selectNamePanel.add(selectNameLabel, BorderLayout.WEST);
 		selectNamePanel.add(selectInfoNameTextField, BorderLayout.CENTER);
@@ -235,6 +289,7 @@ public class SelectView extends JPanel{
 		
 		
 		JPanel selectIngredientPanel = new JPanel();
+		//selectIngredientPanel.setBackground(ClientMain.bgc);
 		selectIngredientPanel.setLayout(new BoxLayout(selectIngredientPanel, BoxLayout.PAGE_AXIS));
 		selectIngredientPanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 10));
 		selectionInformationPanel.add(selectIngredientPanel, BorderLayout.CENTER);
@@ -247,10 +302,12 @@ public class SelectView extends JPanel{
 		
 		JLabel selectNameHeaderLabel = new JLabel("Ingredient");
 		JPanel selectNameHeaderPanel = new JPanel();
+		//selectNameHeaderPanel.setBackground(ClientMain.bgc);
 		selectNameHeaderPanel.add(selectNameHeaderLabel);
 		selectNameHeaderLabel.setPreferredSize(new Dimension(225,20));
 		JLabel selectSizeHeaderLabel = new JLabel("Size (mL)");
 		JPanel selectSizeHeaderPanel = new JPanel();
+		//selectSizeHeaderPanel.setBackground(ClientMain.bgc);
 		selectSizeHeaderPanel.add(selectSizeHeaderLabel);
 		
 		selectIngredientPanelArray[12] = new JPanel(new BorderLayout());
@@ -271,12 +328,18 @@ public class SelectView extends JPanel{
 		for (int i = 0; i < 12; i++){
 			
 			selectIngredientPanelArray[i] = new JPanel(new BorderLayout());
+			//selectIngredientPanelArray[i].setBackground(ClientMain.bgc);
 			selectIngredientNamePanel[i] = new JPanel();
+			//selectIngredientNamePanel[i].setBackground(ClientMain.bgc);
 			selectIngredientNameArray[i] = new JTextField(20);
+			selectIngredientNameArray[i].setBackground(ClientMain.tgbgc);
+			selectIngredientNameArray[i].setForeground(ClientMain.tfgc);
 			selectIngredientNameArray[i].setEditable(false);
 			selectIngredientNamePanel[i].add(selectIngredientNameArray[i]);
 			
 			selectAmountTextArray[i] = new JTextField(3);
+			selectAmountTextArray[i].setBackground(ClientMain.tgbgc);
+			selectAmountTextArray[i].setForeground(ClientMain.tfgc);
 			selectAmountTextArray[i].setEditable(false);
 			selectTextPanelArray[i] = new JPanel();
 			selectTextPanelArray[i].add(selectAmountTextArray[i]);
@@ -291,8 +354,11 @@ public class SelectView extends JPanel{
 		 * It is currently not being used
 		 */
 		JPanel selectDescriptionPanel = new JPanel(new BorderLayout());
+		//selectDescriptionPanel.setBackground(ClientMain.bgc);
 		JLabel selectDescriptionLabel = new JLabel("Drink Description:");
 		JTextArea selectInfoDescriptionTextArea = new JTextArea();
+		selectInfoDescriptionTextArea.setBackground(ClientMain.tgbgc);
+		selectInfoDescriptionTextArea.setForeground(ClientMain.tfgc);
 		selectInfoDescriptionTextArea.setEditable(false);
 		selectInfoDescriptionTextArea.setRows(5);
 		selectInfoDescriptionTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
