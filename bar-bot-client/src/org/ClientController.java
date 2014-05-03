@@ -7,6 +7,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,11 +61,11 @@ public class ClientController {
 		statusUpdater.scheduleAtFixedRate(new Runnable() {
 			public void run() {
 				JTextArea statusField = getStatusField();
+				String text = "";
 				try {
 					byte[] status = checkStatus();
 					boolean idle = status[0] == 0x00;
 					int totalPumps = status[1];
-					String text = "";
 					for(int i = 0; i < totalPumps; i++) {
 						text += String.format("Pump %02d: %3d%%", i, status[i+2] * 100 / 127);
 						if(i % 4 == 3) text += '\n';
@@ -72,9 +73,10 @@ public class ClientController {
 					statusField.setText(text);
 					statusField.repaint();
 				} catch (Exception e) {
-					e.printStackTrace();
-					String text = "Problem retrieving Server information.\n";
+					//e.printStackTrace();
+					text = "Problem retrieving Server information.\n";
 					text += String.format("current Time is %d\n", System.nanoTime());
+				} finally {
 					statusField.setText(text);
 					statusField.repaint();
 				}
