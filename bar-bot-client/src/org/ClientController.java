@@ -14,6 +14,8 @@ import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class ClientController {
 
@@ -35,13 +37,15 @@ public class ClientController {
 		s_view.addDrinkButtonListener(new DrinkButtonListener());
 		s_view.addSearchKeyListener(new SearchKeyListener());
 		s_view.addWindowSwitchListener(new WindowSwitchListener());
+		s_view.addSearchListListener(new SearchListListener());
 		
 		e_view.addAcceptButtonListener(new EditAcceptButtonListener());
-		e_view.addDrinkComboBoxListener(new DrinkComboBoxListener());
+		e_view.addDrinkListListener(new DrinkListListener());
 		e_view.addCreateIngredientListener(new CreateIngredientListener());
 		e_view.addDrinkIngredientListener(new DrinkIngredientListener());
 		e_view.addRemoveButtonListener(new RemoveButtonListener());
 		e_view.addWindowSwitchListener(new WindowSwitchListener());
+		//e_view.addCreateIngredientKeyListener(new CreateIngredientKeyListener());
 		
 		c_view.addAcceptButtonListener(new ConfigAcceptButtonListener());
 		c_view.addWindowSwitchListener(new WindowSwitchListener());
@@ -49,21 +53,24 @@ public class ClientController {
 	
 	
 	public void reInit() throws FileNotFoundException{
-		e_view.clearDrinkComboBox();//editDrinkComboBox.removeAllItems();
-		e_view.addDrinkComboBox(new String("Make a New Drink"));//editDrinkComboBox.addItem(new String("Make a New Drink"));
+		e_view.clearDrinkList();//editDrinkComboBox.removeAllItems();
+		e_view.addDrinkList(new String("Make a New Drink"));//editDrinkComboBox.addItem(new String("Make a New Drink"));
 		
 		int n = 0;
 		while(!model.getDrinkName(n).equals("")){
-			e_view.addDrinkComboBox(model.getDrinkName(n));
+			e_view.addDrinkList(model.getDrinkName(n));
 			s_view.setButtonArrayText(n, model.getDrinkName(n));
 			n++;
 		}
+		e_view.selectDrinkIndex(0);
 		
 		e_view.clearIngredientComboBox();//addIngredientDrinkBox.removeAllItems();
 		e_view.addIngredientComboBox(new String("                    "));//addIngredientDrinkBox.addItem(new String("                    "));
+		e_view.clearIngredientList();
 		
 		for(String s:model.getIngredientsList()){
 			e_view.addIngredientComboBox(s);//addIngredientDrinkBox.addItem(s);
+			e_view.addIngredientList(s);
 		}
 		for(int i = 0; i < 12; i++){	
 		//	ingredientConfigComboBox[i].removeAllItems();
@@ -160,14 +167,21 @@ public class ClientController {
 	
 	class SearchKeyListener implements KeyListener{
 
-		public void keyPressed(KeyEvent arg0) {}
-
-		public void keyReleased(KeyEvent arg0) {
+		public void keyPressed(KeyEvent arg0) {
 			if(arg0.getKeyCode()==KeyEvent.VK_DOWN){
-					s_view.selectSearchResult(s_view.getSelectedIndex()+1);
+				s_view.selectSearchResult(s_view.getSelectedIndex()+1);
 			}
 			else if(arg0.getKeyCode()==KeyEvent.VK_UP){
 				s_view.selectSearchResult(s_view.getSelectedIndex()-1);
+			}
+		}
+
+		public void keyReleased(KeyEvent arg0) {
+			if(arg0.getKeyCode()==KeyEvent.VK_DOWN){
+				//s_view.selectSearchResult(s_view.getSelectedIndex()+1);
+			}
+			else if(arg0.getKeyCode()==KeyEvent.VK_UP){
+				//s_view.selectSearchResult(s_view.getSelectedIndex()-1);
 			}
 			else if(arg0.getKeyCode()==KeyEvent.VK_ENTER){
 				if(s_view.getSelectedIndex()>=0){
@@ -177,7 +191,7 @@ public class ClientController {
 						s_view.setDrinkName("");
 					}
 					Drink d = model.getDrink(s_view.getSelectedName());
-					if(d == null){
+					if(s_view.getSelectedName().equals("") || d == null){
 						return;
 					}
 					s_view.setDrinkName(d.getName());
@@ -193,7 +207,13 @@ public class ClientController {
 			}
 			else{
 				if(s_view.getSearchText().equals("")){
+					//s_view.selectSearchResult(0);
 					s_view.clearSearchResults();
+					int n = 0;
+					while(!model.getDrinkName(n).equals("")){
+						s_view.addSearchResult(model.getDrinkName(n));
+						n++;
+					}
 					return;
 				}
 				s_view.clearSearchResults();
@@ -217,6 +237,31 @@ public class ClientController {
 		
 	}
 	
+	class SearchListListener implements ListSelectionListener{
+
+		public void valueChanged(ListSelectionEvent e) {
+			for(int p = 0; p < 12; p++){
+				s_view.setIngredientName(p, "");
+				s_view.setAmount(p, "");
+				s_view.setDrinkName("");
+			}
+			Drink d = model.getDrink(s_view.getSelectedName());
+			if(s_view.getSelectedName().equals("") || d == null){
+				return;
+			}
+			s_view.setDrinkName(d.getName());
+			
+			int n = 0;
+			Map<String, Integer> ingredients = d.getIngredients();
+			for(String s:ingredients.keySet()){
+				s_view.setIngredientName(n, s);
+				s_view.setAmount(n, "" + ingredients.get(s));
+				n++;
+			}
+		}
+		
+	}
+	
 	class EditAcceptButtonListener implements ActionListener{
 
 		public void actionPerformed(ActionEvent e) {
@@ -227,7 +272,7 @@ public class ClientController {
 			 * Selection Page buttons are updated from here
 			 */
 			
-			if(e_view.getDrinkComboBox().toString().equals("Make a New Drink")){
+			if(e_view.getSelectedDrinkName().equals("Make a New Drink")){
 				Map<String,Integer> newIngredients = new HashMap<>();
 				int i = 0;
 				while(!e_view.getIngredientName(i).equals("") && !e_view.getAmount(i).equals("")){
@@ -277,7 +322,7 @@ public class ClientController {
 	}
 	
 	
-	class DrinkComboBoxListener implements ActionListener{
+	class DrinkListListener implements ListSelectionListener{
 
 		public void actionPerformed(ActionEvent arg0) {
 			if(e_view.getDrinkComboBox() != null){
@@ -304,6 +349,32 @@ public class ClientController {
 				}
 			}
 		}
+
+		public void valueChanged(ListSelectionEvent arg0) {
+			for(int i = 0; i < 12; i++){
+				e_view.setIngredientName(i, "");
+				e_view.setAmount(i, "");
+				e_view.setDrinkName("");
+			}
+			if(e_view.getSelectedDrinkName().equals("Make a New Drink")){
+				return;
+			}
+			Drink d = model.getDrink(e_view.getSelectedDrinkName());
+			if(d == null){
+				return;
+			}
+			e_view.setDrinkName(d.getName());
+			
+			int n = 0;
+			Map<String, Integer> ingredients = d.getIngredients();
+			for(String s:ingredients.keySet()){
+				e_view.setIngredientName(n, s);
+				e_view.setAmount(n, "" + ingredients.get(s));
+				n++;
+			}
+		
+			
+		}
 		
 	}
 	
@@ -323,6 +394,28 @@ public class ClientController {
 		}
 		
 	}
+	
+	/*class CreateIngredientKeyListener implements KeyListener{
+
+		public void keyPressed(KeyEvent e) {}
+
+		public void keyReleased(KeyEvent e) {
+			if(e.getKeyCode() == KeyEvent.VK_ENTER){
+				//Updates Ingredient ComboBox with addIngredientDataField
+				model.getIngredientsList().add(e_view.getCreateIngredientText());//userIngredients.add(addIngredientDataField.getText());
+				e_view.setCreateIngredientText("");//addIngredientDataField.setText("");
+				try {
+					model.saveIngredients("ingredients.txt");
+					reInit();
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+		public void keyTyped(KeyEvent arg0) {}
+		
+	}*/
 	
 	class DrinkIngredientListener implements ActionListener{
 

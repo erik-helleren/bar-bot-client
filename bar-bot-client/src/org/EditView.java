@@ -5,10 +5,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.io.FileNotFoundException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -18,8 +20,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
 
 public class EditView extends JPanel{
 	
@@ -43,11 +48,15 @@ public class EditView extends JPanel{
 	JComboBox<String> editDrinkComboBox;
 	JComboBox<String> addIngredientDrinkBox;
 	
+	DefaultListModel<String> drinkListModel;
+	JList<String> drinkList;
+	
 
 	JMenuItem selectDrink;
 	JMenuItem createDrink;
 	JMenuItem configWindow;
 	
+	DefaultListModel<String> ingredientListModel;
 	JList<String> ingredientList;
 	
 
@@ -103,7 +112,7 @@ public class EditView extends JPanel{
 		 */
 		JPanel addIngredientPanel = new JPanel();
 		addIngredientPanel.setLayout(new BoxLayout(addIngredientPanel, BoxLayout.PAGE_AXIS));
-		addIngredientPanel.setPreferredSize(new Dimension(400, 0));
+		addIngredientPanel.setPreferredSize(new Dimension(500, 0));
 		
 		/*
 		 * Contains items for adding ingredients
@@ -111,16 +120,27 @@ public class EditView extends JPanel{
 		 */
 		JPanel addIngredientDrinkPanel = new JPanel();
 		addIngredientDrinkPanel.setBorder(BorderFactory.createTitledBorder("Make or Edit a Drink"));
+		
+		drinkListModel = new DefaultListModel();
+		drinkList = new JList(drinkListModel);
+		drinkListModel.addElement("Make a New Drink");
+		//searchResultsList.setBackground(ClientMain.tgbgc);
+		//searchResultsList.setForeground(ClientMain.tfgc);
+		//searchResultsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		JScrollPane drinkScrollPane = new JScrollPane();
+		drinkScrollPane.setPreferredSize(new Dimension(250,100));
+		drinkScrollPane.setViewportView(drinkList);
+		addIngredientDrinkPanel.add(drinkScrollPane);
 	
 		editDrinkComboBox = new JComboBox<String>();
 		editDrinkComboBox.addItem(new String("Make a New Drink"));
 		int n = 0;
 		while(!model.getDrinkName(n).equals("")){
-			editDrinkComboBox.addItem(model.getDrinkName(n));
+			drinkListModel.addElement(model.getDrinkName(n));
 			n++;
 		}
 		editDrinkComboBox.setMaximumRowCount(10);
-		addIngredientDrinkPanel.add(editDrinkComboBox);
+		//addIngredientDrinkPanel.add(editDrinkComboBox);
 		
 		addIngredientDrinkBox = new JComboBox<String>();
 		addIngredientDrinkBox.addItem(new String("                    "));
@@ -152,11 +172,16 @@ public class EditView extends JPanel{
 		addIngredientEntryPanel.add(addIngredientDataButton);
 		addIngredientDataPanel.add(addIngredientEntryPanel, BorderLayout.NORTH);
 		
-		ingredientList = new JList<String>();
+		ingredientListModel = new DefaultListModel();
+		ingredientList = new JList<String>(ingredientListModel);
 		ingredientList.setBackground(ClientMain.tgbgc);
 		ingredientList.setForeground(ClientMain.tfgc);
 		
 		addIngredientDataPanel.add(ingredientList, BorderLayout.CENTER);
+		
+		for(String s:model.getIngredientsList()){
+			ingredientListModel.addElement(s);
+		}
 		
 		
 		addIngredientPanel.add(addIngredientDataPanel);
@@ -300,7 +325,7 @@ public class EditView extends JPanel{
 	}
 	
 	
-	//Methods for combo box that contains
+	//Methods for combo box that contains drink names
 	Object getDrinkComboBox(){
 		return editDrinkComboBox.getSelectedItem();
 	}
@@ -311,6 +336,27 @@ public class EditView extends JPanel{
 	
 	void clearDrinkComboBox(){
 		editDrinkComboBox.removeAllItems();
+	}
+	
+	void addDrinkList(String s){
+		drinkListModel.addElement(s);
+	}
+	
+	void clearDrinkList(){
+		drinkListModel.removeAllElements();
+	}
+	
+	void selectDrinkIndex(int i){
+		drinkList.setSelectedIndex(i);
+		drinkList.ensureIndexIsVisible(i);
+	}
+	
+	int getSelectedDrinkIndex(){
+		return drinkList.getSelectedIndex();
+	}
+	
+	String getSelectedDrinkName(){
+		return drinkList.getSelectedValue().toString();
 	}
 	
 	//Methods for the combo box that contains
@@ -335,12 +381,34 @@ public class EditView extends JPanel{
 		return addIngredientDrinkButton.isEnabled();
 	}
 	
+	//Methods for Ingredient Creation/Deletion
 	String getCreateIngredientText(){
 		return addIngredientDataField.getText();
 	}
 	
 	void setCreateIngredientText(String s){
 		addIngredientDataField.setText(s);
+	}
+	
+	void addIngredientList(String s){
+		ingredientListModel.addElement(s);
+	}
+	
+	void clearIngredientList(){
+		ingredientListModel.removeAllElements();
+	}
+	
+	void selectIngredientList(int i){
+		ingredientList.setSelectedIndex(i);
+		ingredientList.ensureIndexIsVisible(i);
+	}
+	
+	int getSelectedIngredient(){
+		return ingredientList.getSelectedIndex();
+	}
+	
+	String getSelectedIngredientName(){
+		return ingredientList.getSelectedValue().toString();
 	}
 	
 	void setDrinkName(String s){
@@ -380,12 +448,16 @@ public class EditView extends JPanel{
 		editResetButton.addActionListener(cancel);
 	}
 	
-	void addDrinkComboBoxListener(ActionListener drinkBox){
-		editDrinkComboBox.addActionListener(drinkBox);
+	void addDrinkListListener(ListSelectionListener drinkBox){
+		drinkList.addListSelectionListener(drinkBox);
 	}
 	
 	void addCreateIngredientListener(ActionListener create){
 		addIngredientDataButton.addActionListener(create);
+		addIngredientDataField.addActionListener(create);
+	}
+	
+	void addCreateIngredientKeyListener(ActionListener create){
 	}
 	
 	void addDrinkIngredientListener(ActionListener e){

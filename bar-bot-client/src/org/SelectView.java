@@ -34,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
 
 public class SelectView extends JPanel{
 	public static final boolean USE_ICONS = false;
@@ -266,6 +267,12 @@ public class SelectView extends JPanel{
 		searchScrollPane.setViewportView(searchResultsList);
 		searchResultPanel.add(searchScrollPane, BorderLayout.CENTER);
 		
+		int n = 0;
+		while(!model.getDrinkName(n).equals("")){
+			addSearchResult(model.getDrinkName(n));
+			n++;
+		}
+		
 		/*
 		 * Information Panel that resides on the right side of the screen
 		 * Contains the drink's DRINK NAME, INGREDIENTS, and DESCRIPTION 
@@ -431,7 +438,12 @@ public class SelectView extends JPanel{
 	}
 	
 	String getSelectedName(){
-		return searchResultsList.getSelectedValue().toString();
+		if(!searchListModel.isEmpty()){
+			return searchResultsList.getSelectedValue().toString();
+		}
+		else{
+			return "";
+		}
 	}
 	
 	/**
@@ -485,6 +497,10 @@ public class SelectView extends JPanel{
 	
 	void addSearchKeyListener(KeyListener search){
 		searchTextField.addKeyListener(search);
+	}
+	
+	void addSearchListListener(ListSelectionListener search){
+		searchResultsList.addListSelectionListener(search);
 	}
 	
 	void addWindowSwitchListener(ActionListener e){

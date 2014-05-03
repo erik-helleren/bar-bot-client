@@ -30,6 +30,7 @@ public class ConfigView extends JPanel{
 	JComboBox<String> ingredientConfigComboBox[];
 	
 	JTextField ipConfigTextField;
+	JTextField passwordTextField;
 
 	JMenuItem selectDrink;
 	JMenuItem createDrink;
@@ -81,14 +82,31 @@ public class ConfigView extends JPanel{
 		
 		
 		JPanel ipConfigPanel = new JPanel();
-		ipConfigPanel.setLayout(new BorderLayout());
+		ipConfigPanel.setLayout(new BoxLayout(ipConfigPanel, BoxLayout.PAGE_AXIS));
 		ipConfigPanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
+		
+		JPanel ipPanel = new JPanel();
+		ipPanel.setLayout(new BorderLayout());
 		JLabel ipConfigLabel = new JLabel("IP Address:");
 		ipConfigTextField = new JTextField(20);
 		ipConfigTextField.setBackground(ClientMain.tbgc);
 		ipConfigTextField.setForeground(ClientMain.tfgc);
-		ipConfigPanel.add(ipConfigLabel, BorderLayout.WEST);
-		ipConfigPanel.add(ipConfigTextField, BorderLayout.CENTER);
+		ipPanel.add(ipConfigLabel, BorderLayout.WEST);
+		ipPanel.add(ipConfigTextField, BorderLayout.CENTER);
+		
+		JPanel passwordPanel = new JPanel();
+		ipConfigPanel.setLayout(new BorderLayout());
+		JLabel passwordLabel = new JLabel("Password:");
+		passwordTextField = new JTextField(20);
+		passwordTextField.setBackground(ClientMain.tbgc);
+		passwordTextField.setForeground(ClientMain.tfgc);
+		passwordPanel.add(passwordLabel, BorderLayout.WEST);
+		passwordPanel.add(passwordTextField, BorderLayout.CENTER);
+		
+		ipConfigPanel.add(ipPanel);
+		ipConfigPanel.add(passwordPanel);
+		
+		
 		arduinoConfigPanel.add(ipConfigPanel, BorderLayout.NORTH);
 		
 		
