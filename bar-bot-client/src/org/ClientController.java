@@ -73,7 +73,9 @@ public class ClientController {
 					statusField.repaint();
 				} catch (Exception e) {
 					e.printStackTrace();
-					statusField.setText("Problem retrieving Server Information.");
+					String text = "Problem retrieving Server information.\n";
+					text += String.format("current Time is %d\n", System.nanoTime());
+					statusField.setText(text);
 					statusField.repaint();
 				}
 			}
@@ -562,12 +564,12 @@ public class ClientController {
 			for(int i = 0; i < 12; i++){
 				model.setPumpID(i,c_view.getIngredientConfig(i));//ingredientConfigComboBox[i].getSelectedItem().toString());
 			}
-			try {
+			/*try {
 				model.saveConfiguration("config");
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 		}
 		
 	}
