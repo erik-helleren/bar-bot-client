@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
 
 import javax.swing.BorderFactory;
@@ -351,6 +352,10 @@ public class EditView extends JPanel{
 		drinkList.ensureIndexIsVisible(i);
 	}
 	
+	void clearDrinkSelection(){
+		drinkList.clearSelection();
+	}
+	
 	int getSelectedDrinkIndex(){
 		return drinkList.getSelectedIndex();
 	}
@@ -407,6 +412,10 @@ public class EditView extends JPanel{
 		return ingredientList.getSelectedIndex();
 	}
 	
+	void clearIngredientSelection(){
+		ingredientList.clearSelection();
+	}
+	
 	String getSelectedIngredientName(){
 		return ingredientList.getSelectedValue().toString();
 	}
@@ -457,7 +466,8 @@ public class EditView extends JPanel{
 		addIngredientDataField.addActionListener(create);
 	}
 	
-	void addCreateIngredientKeyListener(ActionListener create){
+	void addRemoveIngredientMouseListener(MouseListener remove){
+		ingredientList.addMouseListener(remove);
 	}
 	
 	void addDrinkIngredientListener(ActionListener e){

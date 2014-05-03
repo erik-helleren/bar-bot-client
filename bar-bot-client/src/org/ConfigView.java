@@ -35,6 +35,8 @@ public class ConfigView extends JPanel{
 	JMenuItem selectDrink;
 	JMenuItem createDrink;
 	JMenuItem configWindow;
+	
+	ClientModel model;
 
 	ConfigView(ClientModel model){
 		
@@ -70,6 +72,8 @@ public class ConfigView extends JPanel{
 		//configResetButton.addActionListener(this);
 		configAcceptPanel.add(configResetButton, BorderLayout.WEST);
 		
+		this.model = model;
+		
 		/*
 		 * Information Editing Panel that resides on the right side of the screen
 		 * Contains the drink's DRINK NAME, INGREDIENTS, and DESCRIPTION 
@@ -84,10 +88,12 @@ public class ConfigView extends JPanel{
 		JPanel ipConfigPanel = new JPanel();
 		ipConfigPanel.setLayout(new BoxLayout(ipConfigPanel, BoxLayout.PAGE_AXIS));
 		ipConfigPanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
+		//ipConfigPanel.setPreferredSize(new Dimension(1000, 400));
 		
 		JPanel ipPanel = new JPanel();
 		ipPanel.setLayout(new BorderLayout());
-		JLabel ipConfigLabel = new JLabel("IP Address:");
+		ipPanel.setBorder( BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		JLabel ipConfigLabel = new JLabel("IP Address: ");
 		ipConfigTextField = new JTextField(20);
 		ipConfigTextField.setBackground(ClientMain.tbgc);
 		ipConfigTextField.setForeground(ClientMain.tfgc);
@@ -95,8 +101,8 @@ public class ConfigView extends JPanel{
 		ipPanel.add(ipConfigTextField, BorderLayout.CENTER);
 		
 		JPanel passwordPanel = new JPanel();
-		ipConfigPanel.setLayout(new BorderLayout());
-		JLabel passwordLabel = new JLabel("Password:");
+		passwordPanel.setLayout(new BorderLayout());
+		JLabel passwordLabel = new JLabel("Password:  ");
 		passwordTextField = new JTextField(20);
 		passwordTextField.setBackground(ClientMain.tbgc);
 		passwordTextField.setForeground(ClientMain.tfgc);
@@ -178,6 +184,12 @@ public class ConfigView extends JPanel{
 			ingredientConfigPanel.add(configPanelArray[i]);
 		}
 		
+		/*for(String s:model.getIngredientsList()){
+			if(model.getPumpID(s) >= 0){
+				ingredientConfigComboBox[model.getPumpID(s)].setSelectedItem(s);
+			}
+		}*/
+		
 		
 		/*
 		 * Menu Bar
@@ -212,6 +224,14 @@ public class ConfigView extends JPanel{
 		ipConfigTextField.setText(s);
 	}
 	
+	String getPassword(){
+		return passwordTextField.getText();
+	}
+	
+	void setPassword(String s){
+		passwordTextField.setText(s);
+	}
+	
 	String getIngredientConfig(int i){
 		return ingredientConfigComboBox[i].getSelectedItem().toString();
 	}
@@ -219,6 +239,16 @@ public class ConfigView extends JPanel{
 	void resetIngredientConfig(){
 		for(int i = 0; i < 12; i++){
 			ingredientConfigComboBox[i].setSelectedIndex(0);
+		}
+	}
+	
+	void reInitIngredientConfig(){
+		for(int i = 0; i < 12; i++){
+			ingredientConfigComboBox[i].removeAllItems();
+			ingredientConfigComboBox[i].addItem("N/A");
+			for(String s:model.getIngredientsList()){
+				ingredientConfigComboBox[i].addItem(s);
+			}
 		}
 	}
 	

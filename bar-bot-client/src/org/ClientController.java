@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,7 @@ public class ClientController {
 		s_view.addAcceptButtonListener(new AcceptButtonListener());
 		s_view.addDrinkButtonListener(new DrinkButtonListener());
 		s_view.addSearchKeyListener(new SearchKeyListener());
-		s_view.addWindowSwitchListener(new WindowSwitchListener());
+		//s_view.addWindowSwitchListener(new WindowSwitchListener());
 		s_view.addSearchListListener(new SearchListListener());
 		
 		e_view.addAcceptButtonListener(new EditAcceptButtonListener());
@@ -44,11 +46,12 @@ public class ClientController {
 		e_view.addCreateIngredientListener(new CreateIngredientListener());
 		e_view.addDrinkIngredientListener(new DrinkIngredientListener());
 		e_view.addRemoveButtonListener(new RemoveButtonListener());
-		e_view.addWindowSwitchListener(new WindowSwitchListener());
+		e_view.addRemoveIngredientMouseListener(new RemoveIngredientMouseListener());
+		//e_view.addWindowSwitchListener(new WindowSwitchListener());
 		//e_view.addCreateIngredientKeyListener(new CreateIngredientKeyListener());
 		
 		c_view.addAcceptButtonListener(new ConfigAcceptButtonListener());
-		c_view.addWindowSwitchListener(new WindowSwitchListener());
+		//c_view.addWindowSwitchListener(new WindowSwitchListener());
 	}
 	
 	
@@ -62,7 +65,8 @@ public class ClientController {
 			s_view.setButtonArrayText(n, model.getDrinkName(n));
 			n++;
 		}
-		e_view.selectDrinkIndex(0);
+		e_view.clearDrinkSelection();
+		e_view.clearIngredientSelection();
 		
 		e_view.clearIngredientComboBox();//addIngredientDrinkBox.removeAllItems();
 		e_view.addIngredientComboBox(new String("                    "));//addIngredientDrinkBox.addItem(new String("                    "));
@@ -79,6 +83,7 @@ public class ClientController {
 		//		ingredientConfigComboBox[i].addItem(s);
 		//	}
 		}
+		c_view.reInitIngredientConfig();
 	}
 	
 	
@@ -356,6 +361,7 @@ public class ClientController {
 				e_view.setAmount(i, "");
 				e_view.setDrinkName("");
 			}
+			
 			if(e_view.getSelectedDrinkName().equals("Make a New Drink")){
 				return;
 			}
@@ -442,6 +448,50 @@ public class ClientController {
 		
 	}
 	
+	class RemoveIngredientMouseListener implements MouseListener{
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+			if(arg0.getClickCount() >= 2){
+				model.getIngredientsList().remove(e_view.getSelectedIngredientName());//userIngredients.add(addIngredientDataField.getText());
+				//e_view.setCreateIngredientText("");//addIngredientDataField.setText("");
+				e_view.selectIngredientList(0);
+				try {
+					model.saveIngredients("ingredients.txt");
+					reInit();
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	
 	class RemoveButtonListener implements ActionListener{
 
 		public void actionPerformed(ActionEvent e) {
@@ -475,15 +525,16 @@ public class ClientController {
 		public void actionPerformed(ActionEvent arg0) {
 			//System.out.println("HI");
 			model.setIP(c_view.getIP());//ipConfigTextField.getText());
+			
 			for(int i = 0; i < 12; i++){
 				model.setPumpID(i,c_view.getIngredientConfig(i));//ingredientConfigComboBox[i].getSelectedItem().toString());
 			}
-		//	try {
-		//		saveConfiguration("config.txt");
-		//	} catch (FileNotFoundException e1) {
-		//		// TODO Auto-generated catch block
-		//		e1.printStackTrace();
-		//	}
+			try {
+				model.saveConfiguration("config");
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		
 	}
