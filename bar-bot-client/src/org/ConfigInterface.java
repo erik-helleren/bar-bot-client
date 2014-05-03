@@ -22,4 +22,7 @@ public interface ConfigInterface {
 
 	public int getPumpNumber(String s);
 	
+	public byte[] getPassword();
+	public void setPassword(int i);
+	
 }

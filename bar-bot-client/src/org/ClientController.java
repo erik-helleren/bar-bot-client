@@ -66,10 +66,10 @@ public class ClientController {
 				try {
 					byte[] status = checkStatus();
 					for(int i = 0; i < status.length; i++) {
-						//System.err.printf("%02x,", status[i]);
+						System.err.printf("%02x,", status[i]);
 					}
 					System.err.printf("\n");
-					int idle = status[0];
+					/*int idle = status[0];
 					if(idle == 0x00)
 						text = "Server is Idle.\n";
 					else if (idle == 0x01)
@@ -79,8 +79,8 @@ public class ClientController {
 					else if (idle == 0xfe)
 						text = "We got an Authentication response.\n";
 					else 
-						text = "We got a weird response!\n";
-					int totalPumps = status[1];
+						text = "We got a weird response!\n";*/
+					int totalPumps = status.length;
 					String[] pumpIngredients = new String[totalPumps];
 					for(String ingredient: getIngredientsList()) {
 						int pumpid = getPumpID(ingredient);
@@ -96,11 +96,19 @@ public class ClientController {
 						text += "No Pumps detected.";
 					} else {
 						for(int i = 0; i < totalPumps; i++) {
+							String level = "";
+							if(status[i] == 0) level = "Empty";
+							else if (status[i] == 1) level = "Critical";
+							else if (status[i] == 2) level = "Low";
+							else if (status[i] == 3) level = "Medium";
+							else if (status[i] == 4) level = "High";
+							else if (status[i] == 5) level = "FAIL";
+							else level = ""+status[i];
 							if(pumpIngredients[i] != null)
-								text += String.format("Pump %02d - %10s: %3d%%", i, pumpIngredients[i], status[i+2] * 100 / 127);
+								text += String.format("Pump %02d - %10s: %5s  ", i, pumpIngredients[i], level);
 							else
-								text += String.format("Pump %02d - %10s: %3d%%", i, "N/A", status[i+2] * 100 / 127);
-							if(i % 4 == 3) text += '\n';
+								text += String.format("Pump %02d - %10s: %5s  ", i, "N/A", level);
+							if(i % 3 == 2) text += '\n';
 						}
 					}
 					statusField.setText(text);

@@ -101,11 +101,13 @@ public class ClientModel {
 	}
 	
 	void setPassword(int i){
-		password = i;
+		ci.setPassword(i);
 	}
 	
 	int getPassword(){
-		return password;
+		byte[] pw = ci.getPassword();
+		int output = ((int)pw[0] << 24) + ((int)pw[1] << 16) + ((int)pw[2]<<8) + pw[3];
+		return output;
 	}
 	
 	void setPumpID(int i, String s){
