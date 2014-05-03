@@ -65,7 +65,21 @@ public class ClientController {
 				String text = "";
 				try {
 					byte[] status = checkStatus();
-					boolean idle = status[0] == 0x00;
+					for(int i = 0; i < status.length; i++) {
+						//System.err.printf("%02x,", status[i]);
+					}
+					System.err.printf("\n");
+					int idle = status[0];
+					if(idle == 0x00)
+						text = "Server is Idle.\n";
+					else if (idle == 0x01)
+						text = "Server is Busy.\n";
+					else if (idle == 0xff)
+						text = "Authentication Failed!\n";
+					else if (idle == 0xfe)
+						text = "We got an Authentication response.\n";
+					else 
+						text = "We got a weird response!\n";
 					int totalPumps = status[1];
 					String[] pumpIngredients = new String[totalPumps];
 					for(String ingredient: getIngredientsList()) {
@@ -74,16 +88,20 @@ public class ClientController {
 							try{
 								pumpIngredients[pumpid] = ingredient;
 							} catch (ArrayIndexOutOfBoundsException e) {
-								e.printStackTrace();
+								//e.printStackTrace();
 							}
 						}
 					}
-					for(int i = 0; i < totalPumps; i++) {
-						if(pumpIngredients[i] != null)
-							text += String.format("Pump %02d - %10s: %3d%%", i, pumpIngredients[i], status[i+2] * 100 / 127);
-						else
-							text += String.format("Pump %02d - %10s: %3d%%", i, "N/A", status[i+2] * 100 / 127);
-						if(i % 4 == 3) text += '\n';
+					if(totalPumps <= 0) {
+						text += "No Pumps detected.";
+					} else {
+						for(int i = 0; i < totalPumps; i++) {
+							if(pumpIngredients[i] != null)
+								text += String.format("Pump %02d - %10s: %3d%%", i, pumpIngredients[i], status[i+2] * 100 / 127);
+							else
+								text += String.format("Pump %02d - %10s: %3d%%", i, "N/A", status[i+2] * 100 / 127);
+							if(i % 4 == 3) text += '\n';
+						}
 					}
 					statusField.setText(text);
 					statusField.repaint();

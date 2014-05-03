@@ -16,7 +16,7 @@ import java.util.Collections;
  */
 public class ArduinoComunicator {
 	private static final int port=1234;
-	private static final int timeout=3000;
+	private static final int timeout=500;
 	public static final Object commLock = new Object();
 	
 	/**
@@ -113,17 +113,27 @@ public class ArduinoComunicator {
 	public static byte[] checkStatus(ConfigInterface ci) throws Exception {
 		synchronized(commLock) {
 			byte[] returned= new byte[100];
+			for(int i = 0; i < 100; i++) {
+				returned[i] = (byte)i;
+			}
 			byte[] toSend = new byte[1];
 			toSend[0] = 0x00;
 			
-			try (   Socket kkSocket = new Socket(ci.getArduinoIP(), port);)
-		    {
+			try {
+				Socket kkSocket = new Socket(ci.getArduinoIP(), port);
 				kkSocket.setSoTimeout(timeout);
 				kkSocket.getOutputStream().write(toSend);
 				
 		        try{
-		        	kkSocket.getInputStream().read(returned);//will block untill a byte is read or
+		        	int b;
+		        	int i = 0;
+		        	while((b=kkSocket.getInputStream().read()) != -1){
+		        		System.out.printf("%02x,", b);
+		        		returned[i++] = (byte)b;//will block untill a byte is read or
 		        		//timeout is reached
+		        	}
+	        		System.out.printf("%02x,", b);
+		        	System.out.printf("\n");
 		        }catch(java.net.SocketTimeoutException e){
 		        	e.printStackTrace();
 		        }
