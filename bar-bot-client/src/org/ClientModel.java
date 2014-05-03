@@ -22,6 +22,7 @@ public class ClientModel {
 	private int password;
 	
 	ClientModel(){
+		ci = new ClientConfig();
 		DrinkList drinkList = new DrinkList();
 		drinkList.loadFromFile("DrinkDatabase");
 		this.drinkList = drinkList;
@@ -33,6 +34,7 @@ public class ClientModel {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	
@@ -95,7 +97,7 @@ public class ClientModel {
 	}
 	
 	void setIP(String s){
-		ci = new dummyConfig(s);
+		ci.setArduinoIP(s);
 	}
 	
 	void setPassword(int i){

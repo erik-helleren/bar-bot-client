@@ -16,6 +16,7 @@ public interface ConfigInterface {
 	 * @return
 	 */
 	public String getArduinoIP();
+	public void setArduinoIP(String ip);
 
 	public void clear();
 

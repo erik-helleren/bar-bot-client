@@ -67,8 +67,22 @@ public class ClientController {
 					byte[] status = checkStatus();
 					boolean idle = status[0] == 0x00;
 					int totalPumps = status[1];
+					String[] pumpIngredients = new String[totalPumps];
+					for(String ingredient: getIngredientsList()) {
+						int pumpid = getPumpID(ingredient);
+						if(pumpid != -1) {
+							try{
+								pumpIngredients[pumpid] = ingredient;
+							} catch (ArrayIndexOutOfBoundsException e) {
+								e.printStackTrace();
+							}
+						}
+					}
 					for(int i = 0; i < totalPumps; i++) {
-						text += String.format("Pump %02d: %3d%%", i, status[i+2] * 100 / 127);
+						if(pumpIngredients[i] != null)
+							text += String.format("Pump %02d - %10s: %3d%%", i, pumpIngredients[i], status[i+2] * 100 / 127);
+						else
+							text += String.format("Pump %02d - %10s: %3d%%", i, "N/A", status[i+2] * 100 / 127);
 						if(i % 4 == 3) text += '\n';
 					}
 					statusField.setText(text);
@@ -91,6 +105,14 @@ public class ClientController {
 	
 	public JTextArea getStatusField() {
 		return s_view.statusTextArea;
+	}
+	
+	public List<String> getIngredientsList() {
+		return model.getIngredientsList();
+	}
+	
+	public int getPumpID(String s) {
+		return model.getPumpID(s);
 	}
 	
 	public void reInit() throws FileNotFoundException{
@@ -142,6 +164,7 @@ public class ClientController {
 			
 			System.out.println("Making Drinks");
 			byte[] a;
+			//poorly formed syntax
 			try {
 				a = ArduinoComunicator.makeDrink(newDrink, model.getConfigInterface());
 				System.out.println("Made 1 drink"+a);

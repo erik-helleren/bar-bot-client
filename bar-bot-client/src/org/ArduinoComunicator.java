@@ -132,7 +132,8 @@ public class ArduinoComunicator {
 				System.err.println("Unable to connect to arduino");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				//e.printStackTrace();
+				throw e;
 			}
 			return returned;
 		}
