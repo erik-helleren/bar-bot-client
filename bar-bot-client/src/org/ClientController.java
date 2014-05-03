@@ -7,6 +7,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -523,18 +524,49 @@ public class ClientController {
 	class ConfigAcceptButtonListener implements ActionListener{
 
 		public void actionPerformed(ActionEvent arg0) {
-			//System.out.println("HI");
-			model.setIP(c_view.getIP());//ipConfigTextField.getText());
 			
-			for(int i = 0; i < 12; i++){
-				model.setPumpID(i,c_view.getIngredientConfig(i));//ingredientConfigComboBox[i].getSelectedItem().toString());
-			}
+			model.setIP(c_view.getIP());//ipConfigTextField.getText());
+			int passwordInt = Integer.parseInt(c_view.getPassword());
+			byte[] password = new byte[4];
+			password[0] = (byte) (passwordInt >> 24);
+			password[1] = (byte) (passwordInt >> 16);
+			password[2] = (byte) (passwordInt >> 8);
+			password[3] = (byte) (passwordInt);
+
+			
 			try {
-				model.saveConfiguration("config");
+				PrintWriter out = new PrintWriter("config");
+				out.println(c_view.getIP().toString());
+				System.out.println(c_view.getIP());
+				out.println(c_view.getPassword());
+				
+				for(int i = 0; i < 12; i++){
+					model.setPumpID(i,c_view.getIngredientConfig(i));//ingredientConfigComboBox[i].getSelectedItem().toString());
+					out.println(c_view.getIngredientConfig(i));
+				
+				}
+			
+
+				out.flush();
+				out.close();
+			} catch (FileNotFoundException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			
+		/*	try {
+				ArduinoComunicator.submitPassword(password, model.getConfigInterface());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		*/	
+			/*try {
+				//model.saveConfiguration("config");
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 		}
 		
 	}

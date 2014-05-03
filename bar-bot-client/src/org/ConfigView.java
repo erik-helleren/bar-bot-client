@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -157,12 +160,6 @@ public class ConfigView extends JPanel{
 			JLabel pumpNumLabel = new JLabel();
 			pumpNumLabel.setText("Pump #" + (i+1));
 			pumpPanelArray[i].add(pumpNumLabel);
-			//ingredientNamePanel[i] = new JPanel();
-			//ingredientNameArray[i] = new JTextField(20);
-			//ingredientNameArray[i].setText("");
-			//ingredientNameArray[i].setEditable(false);
-			//ingredientNameArray[i].setVisible(false);
-			//ingredientNamePanel[i].add(ingredientNameArray[i]);
 			
 			ingredientConfigComboBox[i] = new JComboBox<String>();
 			ingredientConfigComboBox[i].addItem("N/A");
@@ -172,7 +169,6 @@ public class ConfigView extends JPanel{
 			}
 			
 			
-			//amountTextArray[i].setVisible(false);
 			comboPanelArray[i] = new JPanel();
 			comboPanelArray[i].add(ingredientConfigComboBox[i]);
 			
@@ -180,9 +176,30 @@ public class ConfigView extends JPanel{
 	
 			configPanelArray[i].add(pumpPanelArray[i],BorderLayout.WEST);
 			configPanelArray[i].add(comboPanelArray[i],BorderLayout.CENTER);
-			//ingredientPanelArray[i].setVisible(false);
 			ingredientConfigPanel.add(configPanelArray[i]);
 		}
+		
+		Scanner in;
+		try {
+			in = new Scanner(new File("config"));
+			ipConfigTextField.setText(in.nextLine());
+			passwordTextField.setText(in.nextLine());
+			model.setIP(ipConfigTextField.getText());
+			model.setPassword(Integer.parseInt(passwordTextField.getText()));
+			
+			for(int i = 0; i < 12; i++){
+				ingredientConfigComboBox[i].setSelectedItem(in.nextLine());
+				model.setPumpID(i, ingredientConfigComboBox[i].getSelectedItem().toString());
+			}
+			
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.out.println(in.nextLine());
+		//System.out.println(in.nextLine());
+		
 		
 		/*for(String s:model.getIngredientsList()){
 			if(model.getPumpID(s) >= 0){

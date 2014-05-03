@@ -18,5 +18,7 @@ public interface ConfigInterface {
 	public String getArduinoIP();
 
 	public void clear();
+
+	public int getPumpNumber(String s);
 	
 }

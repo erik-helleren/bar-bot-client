@@ -19,6 +19,8 @@ public class ClientModel {
 	
 	private ConfigInterface ci;
 	
+	private int password;
+	
 	ClientModel(){
 		DrinkList drinkList = new DrinkList();
 		drinkList.loadFromFile("DrinkDatabase");
@@ -27,6 +29,7 @@ public class ClientModel {
 		userIngredients = new ArrayList<String>();
 		try {
 			loadIngredients("ingredients.txt");
+		//	loadConfiguration("config");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -95,8 +98,20 @@ public class ClientModel {
 		ci = new dummyConfig(s);
 	}
 	
+	void setPassword(int i){
+		password = i;
+	}
+	
+	int getPassword(){
+		return password;
+	}
+	
 	void setPumpID(int i, String s){
 		ci.setPumpID(i, s);
+	}
+	
+	int getPumpID(String s){
+		return ci.getPumpNumber(s);
 	}
 	
 	ConfigInterface getConfigInterface(){
@@ -136,6 +151,50 @@ public class ClientModel {
 			e.printStackTrace();
 		}
 	
+		
+	}
+	
+	/**
+	 * Saves the ingredients currently stored in userIngredients
+	 * to fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 */
+	public void saveConfiguration (String fileName) throws FileNotFoundException{
+		FileOutputStream fileOut;
+		try {
+			fileOut = new FileOutputStream(fileName);
+			ObjectOutputStream out= new ObjectOutputStream(fileOut);
+			out.writeObject(ci);
+			out.close();
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+	}
+	
+	/**
+	 * Loads the ingredients currently stored in the file fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 */
+	public void loadConfiguration(String fileName) throws FileNotFoundException{
+		//ci.clear();
+		try {
+			FileInputStream fileIn = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			ci =  (ConfigInterface) in.readObject();
+			in.close();
+			fileIn.close();
+			
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
