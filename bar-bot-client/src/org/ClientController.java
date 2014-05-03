@@ -13,10 +13,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.*;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -27,6 +29,7 @@ public class ClientController {
 	private ConfigView c_view;
 	
 	private ClientModel model;
+	private ScheduledExecutorService statusUpdater;
 	
 	ClientController(ClientModel model, SelectView s_view, EditView e_view, ConfigView c_view){
 		this.s_view = s_view;
@@ -53,8 +56,40 @@ public class ClientController {
 		
 		c_view.addAcceptButtonListener(new ConfigAcceptButtonListener());
 		//c_view.addWindowSwitchListener(new WindowSwitchListener());
+		
+		statusUpdater = Executors.newSingleThreadScheduledExecutor();
+		statusUpdater.scheduleAtFixedRate(new Runnable() {
+			public void run() {
+				JTextArea statusField = getStatusField();
+				try {
+					byte[] status = checkStatus();
+					boolean idle = status[0] == 0x00;
+					int totalPumps = status[1];
+					String text = "";
+					for(int i = 0; i < totalPumps; i++) {
+						text += String.format("Pump %02d: %3d%%", i, status[i+2] * 100 / 127);
+						if(i % 4 == 3) text += '\n';
+					}
+					statusField.setText(text);
+					statusField.repaint();
+				} catch (Exception e) {
+					e.printStackTrace();
+					String text = "Problem retrieving Server information.\n";
+					text += String.format("current Time is %d\n", System.nanoTime());
+					statusField.setText(text);
+					statusField.repaint();
+				}
+			}
+		}, 0, 5, TimeUnit.SECONDS);
 	}
 	
+	public byte[] checkStatus() throws Exception{
+		return ArduinoComunicator.checkStatus(model.getConfigInterface());
+	}
+	
+	public JTextArea getStatusField() {
+		return s_view.statusTextArea;
+	}
 	
 	public void reInit() throws FileNotFoundException{
 		e_view.clearDrinkList();//editDrinkComboBox.removeAllItems();
