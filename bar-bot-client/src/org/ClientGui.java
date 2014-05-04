@@ -21,8 +21,6 @@ import java.util.Set;
 
 import javax.swing.*;
 
-
-
 public class ClientGui extends JFrame implements ActionListener, KeyListener{
 	
 	DrinkList drinkList;
@@ -240,8 +238,8 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 	    searchByPanel.add(searchByIngredientButton);
 	    searchResultPanel.add(searchByPanel, BorderLayout.NORTH);
 		
-		searchListModel = new DefaultListModel();
-		searchResultsList = new JList(searchListModel);
+		searchListModel = new DefaultListModel<String>();
+		searchResultsList = new JList<String>(searchListModel);
 		searchResultsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		searchResultsList.addKeyListener(this);
 		JScrollPane searchScrollPane = new JScrollPane();
@@ -614,7 +612,7 @@ public class ClientGui extends JFrame implements ActionListener, KeyListener{
 		JPanel pumpPanelArray[] = new JPanel[12];
 		
 		JPanel comboPanelArray[] = new JPanel[12];
-		ingredientConfigComboBox = new JComboBox[12];
+		ingredientConfigComboBox = new JComboBox<String>[12];
 		
 		for (int i = 0; i < 12; i++){
 			

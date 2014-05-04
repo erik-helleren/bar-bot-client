@@ -3,23 +3,31 @@ package org;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.io.FileNotFoundException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
 
-public class EditView extends JFrame{
+public class EditView extends JPanel{
 	
 	JPanel editPanel;
 	
@@ -41,10 +49,16 @@ public class EditView extends JFrame{
 	JComboBox<String> editDrinkComboBox;
 	JComboBox<String> addIngredientDrinkBox;
 	
+	DefaultListModel<String> drinkListModel;
+	JList<String> drinkList;
+	
 
 	JMenuItem selectDrink;
 	JMenuItem createDrink;
 	JMenuItem configWindow;
+	
+	DefaultListModel<String> ingredientListModel;
+	JList<String> ingredientList;
 	
 
 	EditView(ClientModel model){
@@ -54,20 +68,22 @@ public class EditView extends JFrame{
 		 */
 		//*************************************************************************************
 		
-		setTitle("Bar-Bot");
-		setSize(1000, 700);
-		setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
-		setBackground(Color.gray);
+		//setTitle("Bar-Bot");
+		setMinimumSize(new Dimension(1000, 700));
+		//setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+		//setBackground(Color.LIGHT_GRAY);
 		//setResizable(false);
-		
+		/*
 		JPanel barbotPanel = new JPanel();
 		barbotPanel.setLayout( new BorderLayout());
-		getContentPane().add(barbotPanel);
+		/*getContentPane().add(barbotPanel);
 		
 		editPanel = new JPanel();
 		editPanel.setLayout( new BorderLayout());
 		editPanel.setVisible(true);
 		barbotPanel.add(editPanel);
+		*/
+		setLayout(new BorderLayout());
 		
 		
 		/*
@@ -76,7 +92,7 @@ public class EditView extends JFrame{
 		
 		JPanel acceptPanel = new JPanel();
 		acceptPanel.setLayout(new BorderLayout());
-		editPanel.add(acceptPanel, BorderLayout.SOUTH);
+		/*editPanel.*/add(acceptPanel, BorderLayout.SOUTH);
 		
 		editAcceptButton = new JButton("Accept");
 		acceptPanel.add(editAcceptButton, BorderLayout.EAST);
@@ -97,7 +113,7 @@ public class EditView extends JFrame{
 		 */
 		JPanel addIngredientPanel = new JPanel();
 		addIngredientPanel.setLayout(new BoxLayout(addIngredientPanel, BoxLayout.PAGE_AXIS));
-		addIngredientPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		addIngredientPanel.setPreferredSize(new Dimension(500, 0));
 		
 		/*
 		 * Contains items for adding ingredients
@@ -105,15 +121,27 @@ public class EditView extends JFrame{
 		 */
 		JPanel addIngredientDrinkPanel = new JPanel();
 		addIngredientDrinkPanel.setBorder(BorderFactory.createTitledBorder("Make or Edit a Drink"));
+		
+		drinkListModel = new DefaultListModel();
+		drinkList = new JList(drinkListModel);
+		drinkListModel.addElement("Make a New Drink");
+		//searchResultsList.setBackground(ClientMain.tgbgc);
+		//searchResultsList.setForeground(ClientMain.tfgc);
+		//searchResultsList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		JScrollPane drinkScrollPane = new JScrollPane();
+		drinkScrollPane.setPreferredSize(new Dimension(250,100));
+		drinkScrollPane.setViewportView(drinkList);
+		addIngredientDrinkPanel.add(drinkScrollPane);
 	
 		editDrinkComboBox = new JComboBox<String>();
 		editDrinkComboBox.addItem(new String("Make a New Drink"));
 		int n = 0;
 		while(!model.getDrinkName(n).equals("")){
-			editDrinkComboBox.addItem(model.getDrinkName(n));
+			drinkListModel.addElement(model.getDrinkName(n));
 			n++;
 		}
-		addIngredientDrinkPanel.add(editDrinkComboBox);
+		editDrinkComboBox.setMaximumRowCount(10);
+		//addIngredientDrinkPanel.add(editDrinkComboBox);
 		
 		addIngredientDrinkBox = new JComboBox<String>();
 		addIngredientDrinkBox.addItem(new String("                    "));
@@ -132,12 +160,31 @@ public class EditView extends JFrame{
 		 * to the database
 		 */
 		JPanel addIngredientDataPanel = new JPanel();
+		addIngredientDataPanel.setLayout(new BorderLayout(0,10));
 		addIngredientDataPanel.setBorder(BorderFactory.createTitledBorder("Add Ingredient to Database"));
+		JPanel addIngredientEntryPanel = new JPanel();
+		addIngredientEntryPanel.setLayout(new FlowLayout());
 		
 		addIngredientDataField = new JTextField(20);
-		addIngredientDataPanel.add(addIngredientDataField);
+		addIngredientDataField.setBackground(ClientMain.tbgc);
+		addIngredientDataField.setForeground(ClientMain.tfgc);
+		addIngredientEntryPanel.add(addIngredientDataField);
 		addIngredientDataButton = new JButton("Accept");
-		addIngredientDataPanel.add(addIngredientDataButton);
+		addIngredientEntryPanel.add(addIngredientDataButton);
+		addIngredientDataPanel.add(addIngredientEntryPanel, BorderLayout.NORTH);
+		
+		ingredientListModel = new DefaultListModel();
+		ingredientList = new JList<String>(ingredientListModel);
+		ingredientList.setBackground(ClientMain.tgbgc);
+		ingredientList.setForeground(ClientMain.tfgc);
+		
+		addIngredientDataPanel.add(ingredientList, BorderLayout.CENTER);
+		
+		for(String s:model.getIngredientsList()){
+			ingredientListModel.addElement(s);
+		}
+		
+		
 		addIngredientPanel.add(addIngredientDataPanel);
 		
 		editDrinkPanel.add(addIngredientPanel);
@@ -148,17 +195,19 @@ public class EditView extends JFrame{
 		 */
 		JPanel informationPanel = new JPanel();
 		informationPanel.setLayout(new BorderLayout());
-		informationPanel.setPreferredSize(new Dimension(400, MAXIMIZED_VERT));
+		informationPanel.setPreferredSize(new Dimension(400, JFrame.MAXIMIZED_VERT));
 		informationPanel.setBorder(BorderFactory.createTitledBorder("Make a Drink"));
 		editDrinkPanel.add(informationPanel);
 		
-		editPanel.add(editDrinkPanel, BorderLayout.WEST);
+		/*editPanel.*/add(editDrinkPanel, BorderLayout.WEST);
 		
 		JPanel editNamePanel = new JPanel();
 		editNamePanel.setLayout(new BorderLayout());
 		editNamePanel.setBorder( BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		JLabel editNameLabel = new JLabel("Drink Name:");
 		infoNameTextField = new JTextField(20);
+		infoNameTextField.setBackground(ClientMain.tbgc);
+		infoNameTextField.setForeground(ClientMain.tfgc);
 		editNamePanel.add(editNameLabel, BorderLayout.WEST);
 		editNamePanel.add(infoNameTextField, BorderLayout.CENTER);
 		informationPanel.add(editNamePanel, BorderLayout.NORTH);
@@ -205,12 +254,16 @@ public class EditView extends JFrame{
 			ingredientPanelArray[i] = new JPanel(new BorderLayout());
 			ingredientNamePanel[i] = new JPanel();
 			ingredientNameArray[i] = new JTextField(20);
+			ingredientNameArray[i].setBackground(ClientMain.tgbgc);
+			ingredientNameArray[i].setForeground(ClientMain.tfgc);
 			ingredientNameArray[i].setText("");
 			ingredientNameArray[i].setEditable(false);
 			//ingredientNameArray[i].setVisible(false);
 			ingredientNamePanel[i].add(ingredientNameArray[i]);
 			
 			amountTextArray[i] = new JTextField(3);
+			amountTextArray[i].setBackground(ClientMain.tbgc);
+			amountTextArray[i].setForeground(ClientMain.tfgc);
 			amountTextArray[i].setText("");
 			//amountTextArray[i].setVisible(false);
 			textPanelArray[i] = new JPanel();
@@ -238,6 +291,8 @@ public class EditView extends JFrame{
 		JPanel descriptionPanel = new JPanel(new BorderLayout());
 		JLabel descriptionLabel = new JLabel("Drink Description:");
 		JTextArea infoDescriptionTextArea = new JTextArea();
+		infoDescriptionTextArea.setBackground(ClientMain.tbgc);
+		infoDescriptionTextArea.setForeground(ClientMain.tfgc);
 		infoDescriptionTextArea.setRows(5);
 		infoDescriptionTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		descriptionPanel.add(descriptionLabel, BorderLayout.NORTH);
@@ -247,7 +302,7 @@ public class EditView extends JFrame{
 		
 		/*
 		 * Menu Bar
-		 */
+		 *
 		JMenuBar menuBar = new JMenuBar();
 		barbotPanel.add(menuBar, BorderLayout.NORTH);
 		
@@ -265,13 +320,13 @@ public class EditView extends JFrame{
 		configWindow = new JMenuItem("Config");
 		//configWindow.addActionListener(this);
 		edit.add(configWindow);
-		
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		*/
+		//this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
 	
 	
-	//Methods for combo box that contains
+	//Methods for combo box that contains drink names
 	Object getDrinkComboBox(){
 		return editDrinkComboBox.getSelectedItem();
 	}
@@ -282,6 +337,33 @@ public class EditView extends JFrame{
 	
 	void clearDrinkComboBox(){
 		editDrinkComboBox.removeAllItems();
+	}
+	
+	void addDrinkList(String s){
+		drinkListModel.addElement(s);
+	}
+	
+	void clearDrinkList(){
+		drinkListModel.removeAllElements();
+	}
+	
+	void selectDrinkIndex(int i){
+		drinkList.setSelectedIndex(i);
+		drinkList.ensureIndexIsVisible(i);
+	}
+	
+	void clearDrinkSelection(){
+		drinkList.clearSelection();
+	}
+	
+	int getSelectedDrinkIndex(){
+		return drinkList.getSelectedIndex();
+	}
+	
+	String getSelectedDrinkName(){
+		return drinkList
+				.getSelectedValue()
+				.toString();
 	}
 	
 	//Methods for the combo box that contains
@@ -306,12 +388,38 @@ public class EditView extends JFrame{
 		return addIngredientDrinkButton.isEnabled();
 	}
 	
+	//Methods for Ingredient Creation/Deletion
 	String getCreateIngredientText(){
 		return addIngredientDataField.getText();
 	}
 	
 	void setCreateIngredientText(String s){
 		addIngredientDataField.setText(s);
+	}
+	
+	void addIngredientList(String s){
+		ingredientListModel.addElement(s);
+	}
+	
+	void clearIngredientList(){
+		ingredientListModel.removeAllElements();
+	}
+	
+	void selectIngredientList(int i){
+		ingredientList.setSelectedIndex(i);
+		ingredientList.ensureIndexIsVisible(i);
+	}
+	
+	int getSelectedIngredient(){
+		return ingredientList.getSelectedIndex();
+	}
+	
+	void clearIngredientSelection(){
+		ingredientList.clearSelection();
+	}
+	
+	String getSelectedIngredientName(){
+		return ingredientList.getSelectedValue().toString();
 	}
 	
 	void setDrinkName(String s){
@@ -351,12 +459,17 @@ public class EditView extends JFrame{
 		editResetButton.addActionListener(cancel);
 	}
 	
-	void addDrinkComboBoxListener(ActionListener drinkBox){
-		editDrinkComboBox.addActionListener(drinkBox);
+	void addDrinkListListener(ListSelectionListener drinkBox){
+		drinkList.addListSelectionListener(drinkBox);
 	}
 	
 	void addCreateIngredientListener(ActionListener create){
 		addIngredientDataButton.addActionListener(create);
+		addIngredientDataField.addActionListener(create);
+	}
+	
+	void addRemoveIngredientMouseListener(MouseListener remove){
+		ingredientList.addMouseListener(remove);
 	}
 	
 	void addDrinkIngredientListener(ActionListener e){

@@ -1,9 +1,10 @@
-//package org;
+package org;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class dummyConfig implements ConfigInterface {
+public class dummyConfig implements ConfigInterface, Serializable {
     int counter=0;
     Map<String, Integer> pairings;
     String arduinoIP;
@@ -18,6 +19,14 @@ public class dummyConfig implements ConfigInterface {
 		if(out==null){
 			out=counter++;
 			pairings.put(name,out);
+		}
+		return out;
+	}
+	
+	public int getPumpNumber(String name){
+		Integer out=pairings.get(name);
+		if(out==null){
+			return -1;
 		}
 		return out;
 	}

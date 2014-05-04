@@ -1,4 +1,4 @@
-//package org;
+package org;
 
 public interface ConfigInterface {
 	/**
@@ -16,7 +16,13 @@ public interface ConfigInterface {
 	 * @return
 	 */
 	public String getArduinoIP();
+	public void setArduinoIP(String ip);
 
 	public void clear();
+
+	public int getPumpNumber(String s);
+	
+	public byte[] getPassword();
+	public void setPassword(int i);
 	
 }

@@ -1,5 +1,6 @@
 package org;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,7 +19,10 @@ public class ClientModel {
 	
 	private ConfigInterface ci;
 	
+	private int password;
+	
 	ClientModel(){
+		ci = new ClientConfig();
 		DrinkList drinkList = new DrinkList();
 		drinkList.loadFromFile("DrinkDatabase");
 		this.drinkList = drinkList;
@@ -26,9 +30,11 @@ public class ClientModel {
 		userIngredients = new ArrayList<String>();
 		try {
 			loadIngredients("ingredients.txt");
+		//	loadConfiguration("config");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	
@@ -91,11 +97,25 @@ public class ClientModel {
 	}
 	
 	void setIP(String s){
-		ci = new dummyConfig(s);
+		ci.setArduinoIP(s);
+	}
+	
+	void setPassword(int i){
+		ci.setPassword(i);
+	}
+	
+	int getPassword(){
+		byte[] pw = ci.getPassword();
+		int output = ((int)pw[0] << 24) + ((int)pw[1] << 16) + ((int)pw[2]<<8) + pw[3];
+		return output;
 	}
 	
 	void setPumpID(int i, String s){
 		ci.setPumpID(i, s);
+	}
+	
+	int getPumpID(String s){
+		return ci.getPumpNumber(s);
 	}
 	
 	ConfigInterface getConfigInterface(){
@@ -104,17 +124,20 @@ public class ClientModel {
 	
 	public void loadIngredients(String fileName) throws FileNotFoundException{
 		userIngredients.clear();
-		try {
-			FileInputStream fileIn = new FileInputStream(fileName);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			userIngredients = (ArrayList<String>) in.readObject();
-			in.close();
-			fileIn.close();
-			
-			
-		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		File f = new File(fileName);
+		if(f.exists() && !f.isDirectory()){
+			try {
+				FileInputStream fileIn = new FileInputStream(fileName);
+				ObjectInputStream in = new ObjectInputStream(fileIn);
+				userIngredients = (ArrayList<String>) in.readObject();
+				in.close();
+				fileIn.close();
+				
+				
+			} catch (IOException | ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	
 	}
@@ -132,6 +155,50 @@ public class ClientModel {
 			e.printStackTrace();
 		}
 	
+		
+	}
+	
+	/**
+	 * Saves the ingredients currently stored in userIngredients
+	 * to fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 */
+	public void saveConfiguration (String fileName) throws FileNotFoundException{
+		FileOutputStream fileOut;
+		try {
+			fileOut = new FileOutputStream(fileName);
+			ObjectOutputStream out= new ObjectOutputStream(fileOut);
+			out.writeObject(ci);
+			out.close();
+			fileOut.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+	}
+	
+	/**
+	 * Loads the ingredients currently stored in the file fileName
+	 * @param fileName
+	 * @throws FileNotFoundException
+	 */
+	public void loadConfiguration(String fileName) throws FileNotFoundException{
+		//ci.clear();
+		try {
+			FileInputStream fileIn = new FileInputStream(fileName);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			ci =  (ConfigInterface) in.readObject();
+			in.close();
+			fileIn.close();
+			
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
