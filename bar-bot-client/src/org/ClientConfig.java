@@ -69,5 +69,9 @@ public class ClientConfig implements ConfigInterface {
 	public void setPassword(int pw) {
 		password = pw;
 	}
+	
+	public Map<Integer, String> getIngredientsMap() {
+		return ingredients;
+	}
 
 }

@@ -519,6 +519,8 @@ public class ClientController {
 					e_view.addIngredientComboBox(s);//addIngredientDrinkBox.addItem(s);
 					e_view.addIngredientList(s);
 				}
+
+				c_view.reInitIngredientConfig();
 				//reInit();
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
@@ -595,6 +597,7 @@ public class ClientController {
 						e_view.addIngredientComboBox(s);//addIngredientDrinkBox.addItem(s);
 						e_view.addIngredientList(s);
 					}
+					c_view.reInitIngredientConfig();
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

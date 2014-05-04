@@ -1,5 +1,7 @@
 package org;
 
+import java.util.Map;
+
 public interface ConfigInterface {
 	/**
 	 * Get the pump ID that corasponsds to
@@ -24,5 +26,6 @@ public interface ConfigInterface {
 	
 	public byte[] getPassword();
 	public void setPassword(int i);
+	public Map<Integer, String> getIngredientsMap();
 	
 }

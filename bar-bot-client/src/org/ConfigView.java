@@ -266,6 +266,8 @@ public class ConfigView extends JPanel{
 			for(String s:model.getIngredientsList()){
 				ingredientConfigComboBox[i].addItem(s);
 			}
+			if(model.getConfigInterface().getIngredientsMap().containsKey(i))
+				ingredientConfigComboBox[i].setSelectedItem(model.getConfigInterface().getIngredientsMap().get(i));
 		}
 	}
 	
