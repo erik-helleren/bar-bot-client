@@ -31,6 +31,7 @@ public class ClientController {
 	
 	private ClientModel model;
 	private ScheduledExecutorService statusUpdater;
+	Map<Short, String> orders;
 	
 	ClientController(ClientModel model, SelectView s_view, EditView e_view, ConfigView c_view){
 		this.s_view = s_view;
@@ -38,7 +39,7 @@ public class ClientController {
 		this.c_view = c_view;
 		this.model = model;
 		
-		
+		orders = new HashMap<Short, String>();
 		
 		s_view.addAcceptButtonListener(new AcceptButtonListener());
 		s_view.addDrinkButtonListener(new DrinkButtonListener());
@@ -65,21 +66,6 @@ public class ClientController {
 				String text = "";
 				try {
 					byte[] status = checkStatus();
-					for(int i = 0; i < status.length; i++) {
-						System.err.printf("%02x,", status[i]);
-					}
-					System.err.printf("\n");
-					/*int idle = status[0];
-					if(idle == 0x00)
-						text = "Server is Idle.\n";
-					else if (idle == 0x01)
-						text = "Server is Busy.\n";
-					else if (idle == 0xff)
-						text = "Authentication Failed!\n";
-					else if (idle == 0xfe)
-						text = "We got an Authentication response.\n";
-					else 
-						text = "We got a weird response!\n";*/
 					int totalPumps = status.length;
 					String[] pumpIngredients = new String[totalPumps];
 					for(String ingredient: getIngredientsList()) {
@@ -107,9 +93,30 @@ public class ClientController {
 							if(pumpIngredients[i] != null)
 								text += String.format("Pump %02d - %10s: %5s  ", i, pumpIngredients[i], level);
 							else
+								
 								text += String.format("Pump %02d - %10s: %5s  ", i, "N/A", level);
 							if(i % 3 == 2) text += '\n';
 						}
+					}
+					if(!text.endsWith("\n")) text += '\n';
+					Map<Short, String> currOrders = getOrders();
+					for(short id: currOrders.keySet()) {
+						status = checkDrinkStatus(id);
+						String code;
+						if(status[0] == 0x00) code = "Queued";
+						else if (status[0] == 0x01) code = "Being Made";
+						else if (status[0] == 0x02) {
+							code = "Success";
+							currOrders.remove(id);
+						}
+						else if (status[0] == 0x03) code = "Failed";
+						else if (status[0] == 0x04) {
+							code = "No Record";
+							currOrders.remove(id);
+						}
+						else code = "UNKNOWN";
+						text += String.format("Drink %4d (%s): %s\n", id, currOrders.get(id), code);
+						
 					}
 					statusField.setText(text);
 					statusField.repaint();
@@ -129,6 +136,10 @@ public class ClientController {
 		return ArduinoComunicator.checkStatus(model.getConfigInterface());
 	}
 	
+	public byte[] checkDrinkStatus(short id) throws Exception {
+		return ArduinoComunicator.checkDrinkStatus(id, model.getConfigInterface());
+	}
+	
 	public JTextArea getStatusField() {
 		return s_view.statusTextArea;
 	}
@@ -139,6 +150,10 @@ public class ClientController {
 	
 	public int getPumpID(String s) {
 		return model.getPumpID(s);
+	}
+	
+	public Map<Short, String> getOrders() {
+		return orders;
 	}
 	
 	public void reInit() throws FileNotFoundException{
@@ -193,10 +208,15 @@ public class ClientController {
 			//poorly formed syntax
 			try {
 				a = ArduinoComunicator.makeDrink(newDrink, model.getConfigInterface());
-				System.out.println("Made 1 drink"+a);
+				if(a[0] == 0x00) {
+					short retid = (short)((a[1]<<8) + a[2]);
+					orders.put(retid, newDrink.getName());
+				}
+				//System.out.println("Made 1 drink"+a);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				//e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Some Ingredients do not have Pumps registered with them!");
 			}
 		}
 	}
@@ -363,7 +383,7 @@ public class ClientController {
 			 * screen and creates a JSON drink object with it.
 			 * Selection Page buttons are updated from here
 			 */
-			
+			System.err.printf("\n\n\'" + e_view.getSelectedDrinkName() + "\'\n\n");
 			if(e_view.getSelectedDrinkName().equals("Make a New Drink")){
 				Map<String,Integer> newIngredients = new HashMap<>();
 				int i = 0;
@@ -373,12 +393,22 @@ public class ClientController {
 				}
 				Drink newDrink = new Drink(e_view.getDrinkName(), newIngredients);
 				model.addDrink(newDrink);//drinkList.getDrinkSet().add(newDrink);
+				e_view.addDrinkList(new String(e_view.getDrinkName()));
+				//e_view.drinkList.repaint();
+				int n = 0;
+				s_view.clearSearchResults();
+				while(!model.getDrinkName(n).equals("")){
+					s_view.setButtonArrayText(n, model.getDrinkName(n));
+					s_view.addSearchResult(model.getDrinkName(n));
+					n++;
+				}
 				model.writeToFile();
 				
 			}
 			else{
 				Set<Drink> temp = new HashSet<>();
-				Drink d = model.getDrink(e_view.getDrinkComboBox().toString());
+				Drink d = model.getDrink(e_view.getSelectedDrinkName());
+				System.err.printf("\""+ e_view.getSelectedDrinkName() + "\"\n\n");
 				if(d != null){
 					temp.add(d);
 					//d.getIngredients().clear();
@@ -403,12 +433,12 @@ public class ClientController {
 				//drinkArray.remove(temp);
 			}
 			
-			try {
+			/*try {
 				reInit();
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 		}
 		
 	}
@@ -448,7 +478,7 @@ public class ClientController {
 				e_view.setAmount(i, "");
 				e_view.setDrinkName("");
 			}
-			
+			System.err.printf("\n\n\'" + e_view.getSelectedDrinkName() + "\'\n\n");
 			if(e_view.getSelectedDrinkName().equals("Make a New Drink")){
 				return;
 			}
@@ -479,7 +509,17 @@ public class ClientController {
 			e_view.setCreateIngredientText("");//addIngredientDataField.setText("");
 			try {
 				model.saveIngredients("ingredients.txt");
-				reInit();
+				e_view.clearIngredientSelection();
+				e_view.clearIngredientComboBox();
+				e_view.addIngredientComboBox(new String("                    "));//addIngredientDrinkBox.addItem(new String("                    "));
+				e_view.clearIngredientList();
+				
+				for(String s:model.getIngredientsList()){
+					System.out.printf(s + "\n");
+					e_view.addIngredientComboBox(s);//addIngredientDrinkBox.addItem(s);
+					e_view.addIngredientList(s);
+				}
+				//reInit();
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -545,7 +585,16 @@ public class ClientController {
 				e_view.selectIngredientList(0);
 				try {
 					model.saveIngredients("ingredients.txt");
-					reInit();
+					e_view.clearIngredientSelection();
+					e_view.clearIngredientComboBox();
+					e_view.addIngredientComboBox(new String("                    "));//addIngredientDrinkBox.addItem(new String("                    "));
+					e_view.clearIngredientList();
+					
+					for(String s:model.getIngredientsList()){
+						System.out.printf(s + "\n");
+						e_view.addIngredientComboBox(s);//addIngredientDrinkBox.addItem(s);
+						e_view.addIngredientList(s);
+					}
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

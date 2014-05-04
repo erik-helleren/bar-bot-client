@@ -409,7 +409,8 @@ public class SelectView extends JPanel{
 	 * @param s
 	 */
 	void setButtonArrayText(int i, String s){
-		buttonArray[i].setText(s);
+		if(i < buttonArray.length)
+			buttonArray[i].setText(s);
 	}
 	
 	String getButtonArrayText(int i){

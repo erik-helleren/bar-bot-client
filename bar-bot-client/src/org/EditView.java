@@ -361,7 +361,9 @@ public class EditView extends JPanel{
 	}
 	
 	String getSelectedDrinkName(){
-		return drinkList.getSelectedValue().toString();
+		return drinkList
+				.getSelectedValue()
+				.toString();
 	}
 	
 	//Methods for the combo box that contains
